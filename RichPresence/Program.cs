@@ -2,6 +2,7 @@
 using DiscordRPC.Logging;
 using System;
 using System.Windows;
+using static MemoryHelper;
 
 namespace ASRT_RichPresence
 {
@@ -13,6 +14,9 @@ namespace ASRT_RichPresence
 			// The main thread, where the rich presence magic will happen :)
 			try
 			{
+				// Initialise game memory access
+				MemoryHelper.Initialise();
+
 				// Create a rich presence client
 				client = new DiscordRpcClient("759459364951031821");
 
