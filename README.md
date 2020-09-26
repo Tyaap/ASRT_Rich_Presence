@@ -12,8 +12,8 @@
 4. Run the game and check your Discord status!
 
 ## How it works
-1. When the game launches it loads `dinput8.dll`. This is a proxy for the real DirectInput API made by Microsoft.
-2. The game calls `DirectInput8Create` which triggers the creation of a new thread.
+1. When the game launches it loads `dinput8.dll`. This is written in pure C, and is a proxy for the real DirectInput API made by Microsoft.
+2. The game calls `DirectInput8Create` from this DLL, which triggers the creation of a new thread.
 3. This thread runs a CLR bootstrapper which loads `RichPresence.dll`
 4. The .NET code inside `RichPresence.dll` hosts a Discord rich presence client.
 
