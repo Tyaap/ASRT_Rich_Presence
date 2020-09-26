@@ -16,13 +16,13 @@
 2. The game calls `DirectInput8Create` from this DLL, which triggers the creation of a new thread.
 3. This thread runs a CLR bootstrapper which loads `RichPresence.dll`
 4. The .NET code inside `RichPresence.dll` hosts a Discord rich presence client.
-5. Game memory can be easily accessed using the `MemoryHelper` class.
 
 ## How to develop
 * Rich presence features are to be developed inside the `RichPresence` project.
 * The code for the project starts in `Program.cs`. Currently there is just a simple rich presence test.
 * The application ID used in `Program.cs` is for a Discord app which was created using the [Discord Developer Portal](https://discord.com/developers/applications).
 * Documentation on Discord rich presence is available [here](https://discord.com/developers/docs/rich-presence/how-to).
+* Game memory can be easily accessed using the `MemoryHelper` class.
 
 ## Libraries used
 * DirectInput Proxy DLL - https://github.com/zerosum0x0/dinput-proxy-dll
