@@ -15,7 +15,7 @@
 1. When the game launches it loads `dinput8.dll`. This is a proxy for the real DirectInput API made by Microsoft.
 2. The game calls `DirectInput8Create` which triggers the creation of a new thread.
 3. This thread runs a CLR bootstrapper which loads `RichPresence.dll`
-4. The managed code inside `RichPresence.dll` hosts a Discord rich presence client.
+4. The .NET code inside `RichPresence.dll` hosts a Discord rich presence client.
 
 ## How to develop
 * Rich presence features are to be developed inside the RichPresence project.
