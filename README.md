@@ -18,7 +18,7 @@
 4. The .NET code inside `RichPresence.dll` hosts a Discord rich presence client.
 
 ## How to develop
-* Rich presence features are to be developed inside the RichPresence project.
+* Rich presence features are to be developed inside the `RichPresence` project.
 * The code for the project starts in `Program.cs`. Currently there is just a simple rich presence test.
 * The application ID used in `Program.cs` is for a Discord app which was created using the [Discord Developer Portal](https://discord.com/developers/applications).
 * Documentation on Discord rich presence is available [here](https://discord.com/developers/docs/rich-presence/how-to).
