@@ -20,7 +20,7 @@
 ## How to develop
 * Rich presence features are to be developed inside the RichPresence project.
 * The code for the project starts in `Program.cs`. Currently there is just a simple rich presence test.
-* The application ID used in `Program.cs` is for a Discord App which I creted using the [Discord Developer Portal](https://discord.com/developers/applications).
+* The application ID used in `Program.cs` is for a Discord app which was created using the [Discord Developer Portal](https://discord.com/developers/applications).
 
 ## Libraries used
 * DirectInput Proxy DLL - https://github.com/zerosum0x0/dinput-proxy-dll
