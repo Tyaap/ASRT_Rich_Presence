@@ -1,4 +1,5 @@
 ## How to use
+Clone and build the project using Visual Studio 2019
 Copy these files to the game directory and then run the game:
 * dinput8.dll
 * RichPresence.dll
