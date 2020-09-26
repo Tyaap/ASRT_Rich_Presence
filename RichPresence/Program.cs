@@ -1,4 +1,4 @@
-﻿using DiscordRPC;
+using DiscordRPC;
 using DiscordRPC.Logging;
 using System;
 using System.Windows;
@@ -29,14 +29,164 @@ namespace ASRT_RichPresence
 				// Connect to the Discord IPC
 				client.Initialize();
 
+                // Defining important variable
+                string menuState = "";
+                string trackName = "";
+                int inMenu = 1;
+                int isOnlineMode = 0;
+
+
+                // Final variables for Discord RichPresence
+                string richState = "Game Started";
+                string richDetails = "";
+
 				// Simple rich presence test
                 while (true)
                 {
 					System.Threading.Thread.Sleep(5000);
-					client.SetPresence(new RichPresence()
+
+                    // Determine track name
+                    switch (ReadUInt(ReadUInt(0xBC7434) + 0))
+                    {
+                        case 0:
+                            trackName = "Dummy";
+                            break;
+                        case 0xD4257EBD:
+                            trackName = "Ocean View";
+                            break;
+                        case 0x32D305A8:
+                            trackName = "Samba Studios";
+                            break;
+                        case 0xC72B3B98:
+                            trackName = "Carrier Zone";
+                            break;
+                        case 0x03EB7FFF:
+                            trackName = "Dragon Canyon";
+                            break;
+                        case 0xE3121777:
+                            trackName = "Temple Trouble";
+                            break;
+                        case 0x4E015AB6:
+                            trackName = "Galactic Parade";
+                            break;
+                        case 0x503C1CBC:
+                            trackName = "Seasonal Shrines";
+                            break;
+                        case 0x7534B7CA:
+                            trackName = "Rogue's Landing";
+                            break;
+                        case 0x38A394ED:
+                            trackName = "Dream Valley";
+                            break;
+                        case 0xC5C9DEA1:
+                            trackName = "Chilly Castle";
+                            break;
+                        case 0xD936550C:
+                            trackName = "Graffity City";
+                            break;
+                        case 0x4A0FF7AE:
+                            trackName = "Sancturay Falls";
+                            break;
+                        case 0xCD8017BA:
+                            trackName = "Graveyard Gig";
+                            break;
+                        case 0xDC93F18B:
+                            trackName = "Adder's Lair";
+                            break;
+                        case 0x2DB91FC2:
+                            trackName = "Burning Depths";
+                            break;
+                        case 0x94610644:
+                            trackName = "Race Of Ages";
+                            break;
+                        case 0xE6CD97F0:
+                            trackName = "Sunshine Tour";
+                            break;
+                        case 0xE87FDF22:
+                            trackName = "Shibuya Downtown";
+                            break;
+                        case 0x17463C8D:
+                            trackName = "Roulette Road";
+                            break;
+                        case 0xFEBC639E:
+                            trackName = "Egg Hangar";
+                            break;
+                        case 0x1EF56CE1:
+                            trackName = "Outrun Bay";
+                            break;
+                    }
+
+
+                    // Determine if ingame or in-menu
+                    if (ReadUInt(ReadUInt(ReadUInt(0xBCE920) + 0) + 0xC1B8) == 0)
+                    {
+                        inMenu = 1;
+                    } else
+                    {
+                        inMenu = 0;
+                    }
+
+                    // Determine if in online mode or not
+                    if (ReadUShort(ReadUInt(0xEC1A88) + 0x525)  == 0)
+                    {
+                        isOnlineMode = 0;
+                    }
+                    else
+                    {
+                        isOnlineMode = 1;
+                    }
+
+
+                    // Determine menu state
+                    switch (ReadInt(0xC56890))
+                    {
+	                    case 0:
+		                    menuState = "World Tour";
+		                    break;
+	                    case 1:
+                            menuState = "GP mode";
+		                    break;
+	                    case 2:
+                            menuState = "Time Attack";
+		                    break;
+	                    case 3:
+                            menuState = "Single Race";
+		                    break;
+                    }
+
+
+
+                    // If in-menu and offline, don't show 
+                    if (inMenu == 1)
+                    {
+                        if (isOnlineMode == 1)
+                        {
+                            richDetails = "In Lobby";
+                            richState = "Online Matchmaking";
+                        }
+                        else
+                        {
+                            richDetails = "Game Menu";
+                            richState = "";
+                        }
+                    }
+                    else
+                    {
+                        if (isOnlineMode == 1)
+                        {
+                            richState = "Online Matchmaking";
+                        } else
+                        {
+                            richState = menuState;
+                        }
+                        richDetails = trackName;
+                    }
+
+
+                    client.SetPresence(new RichPresence()
 					{
-						Details = "S&ASRT rich presence test",
-						State = "Playing S&ASRT"
+						Details = richDetails,
+						State = richState
 					});
 				}
 			}
