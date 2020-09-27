@@ -1,6 +1,8 @@
 ﻿using DiscordRPC;
 using DiscordRPC.Logging;
+using DiscordRPC.Message;
 using System;
+using System.Diagnostics;
 using System.Windows;
 using static MemoryHelper;
 
@@ -8,23 +10,18 @@ namespace ASRT_RichPresence
 {
     class Program
     {
-		public DiscordRpcClient client;
-		public int Run()
+        public DiscordRpcClient client;
+        public int Run()
         {
-			// The main thread, where the rich presence magic will happen :)
-			try
-			{
-				// Initialise game memory access
-				MemoryHelper.Initialise();
+            // The main thread, where the rich presence magic will happen :)
+            try
+            {
+                // Initialise game memory access
+                MemoryHelper.Initialise();
 
-				// Create a rich presence client
-				client = new DiscordRpcClient("759459364951031821");
-
-				// Example event subscription
-				client.OnReady += (sender, e) =>
-				{
-	//				MessageBox.Show("Received Ready from user " + e.User.Username);
-				};
+                // Create a rich presence client
+                client = new DiscordRpcClient("759459364951031821");
+                client.OnJoinRequested += OnJoinRequested;
 
 
                 // Connect to the Discord IPC
@@ -41,21 +38,24 @@ namespace ASRT_RichPresence
                 string menuState = "";
                 string trackName = "";
                 string trackImage = "";
+                string racemodeName = "";
+                string racemodeImage = "";
                 int inMenu = 1;
                 int isOnlineMode = 0;
                 string lobbyID = "";
                 int lobbySize = 0;
-                int racemode = 0;
-                string racemodeText = "";
 
 
                 // Final variables for Discord RichPresence
                 string richState = "Game Started";
                 string richDetails = "";
 
-				// Simple rich presence test
+                // Simple rich presence test
                 while (true)
                 {
+
+
+                    /*
                     // Determine race mode
                     racemode = (ReadInt(0xBC7430) - ReadInt(0xBD0270)) / 0xB4;
                     if (racemode < 0) { racemode = 0; }
@@ -189,8 +189,67 @@ namespace ASRT_RichPresence
                             racemodeText = "Jet Set Tag";
                             break;
                     }
+                    */
 
-
+                    switch (ReadUInt(ReadUInt(0xBCE914) + 0x38))
+                    {
+                        case 0x4AFC561D:
+                            racemodeName = "Single Race";
+                            racemodeImage = "singlerace";
+                            break;
+                        case 0x447473BC:
+                            racemodeName = "Battle Arena";
+                            racemodeImage = "battlearena";
+                            break;
+                        case 0xE64B5DD8:
+                            racemodeName = "Battle Race";
+                            racemodeImage = "battlerace";
+                            break;
+                        case 0xCCB41574:
+                            racemodeName = "Capture the Chao";
+                            racemodeImage = "capturethechao";
+                            break;
+                        case 0x3CBA89B4:
+                            racemodeName = "Boost Challenge";
+                            racemodeImage = "boostchallenge";
+                            break;
+                        case 0x79E12D5C:
+                            racemodeName = "Time Attack";
+                            racemodeImage = "timeattack";
+                            break;
+                        case 0x77E95ADC:
+                            racemodeName = "Sprint";
+                            racemodeImage = "sprint";
+                            break;
+                        case 0xBC7C19CF:
+                            racemodeName = "Persuit";
+                            racemodeImage = "persuit";
+                            break;
+                        case 0xB06F818B:
+                            racemodeName = "Drift Challenge";
+                            racemodeImage = "driftchallenge";
+                            break;
+                        case 0x9FBFB99B:
+                            racemodeName = "Traffic Attack";
+                            racemodeImage = "trafficattack";
+                            break;
+                        case 0xEC587062:
+                            racemodeName = "Versus";
+                            racemodeImage = "versus";
+                            break;
+                        case 0x091F29F4:
+                            racemodeName = "Grand Prix";
+                            racemodeImage = "gprace";
+                            break;
+                        case 0xAD538D8D:
+                            racemodeName = "Ring Race";
+                            racemodeImage = "ringrace";
+                            break;
+                        case 0x61FF5D42:
+                            racemodeName = "Boost Race";
+                            racemodeImage = "boostrace";
+                            break;
+                    }
 
                     // Determine track name
                     switch (ReadUInt(ReadUInt(0xBC7434) + 0))
@@ -315,13 +374,14 @@ namespace ASRT_RichPresence
                     if (ReadUInt(ReadUInt(ReadUInt(0xBCE920) + 0) + 0xC1B8) == 0)
                     {
                         inMenu = 1;
-                    } else
+                    }
+                    else
                     {
                         inMenu = 0;
                     }
 
                     // Determine if in online mode or not
-                    if (ReadUShort(ReadUInt(0xEC1A88) + 0x525)  == 0)
+                    if (ReadUShort(ReadUInt(0xEC1A88) + 0x525) == 0)
                     {
                         isOnlineMode = 0;
                     }
@@ -334,18 +394,18 @@ namespace ASRT_RichPresence
                     // Determine menu state
                     switch (ReadInt(0xC56890))
                     {
-	                    case 0:
-		                    menuState = "World Tour";
-		                    break;
-	                    case 1:
+                        case 0:
+                            menuState = "World Tour";
+                            break;
+                        case 1:
                             menuState = "Grand Prix";
-		                    break;
-	                    case 2:
+                            break;
+                        case 2:
                             menuState = "Time Attack";
-		                    break;
-	                    case 3:
+                            break;
+                        case 3:
                             menuState = "Single Race";
-		                    break;
+                            break;
                     }
 
 
@@ -387,15 +447,14 @@ namespace ASRT_RichPresence
                             lobbySize = 0;
                             friendlySecret2 = "";
                         }
-                        richDetails = trackName;
+
+                        if (richState != racemodeName)
+                        {
+                            richDetails = racemodeName;
+                        }
                     }
 
-
-                   
-
-
-                        //
-                    client.SetSubscription(EventType.Join | EventType.Spectate | EventType.JoinRequest);
+                    client.SetSubscription(EventType.Join | EventType.JoinRequest);
 
                     client.SetPresence(new RichPresence()
                     {
@@ -403,7 +462,7 @@ namespace ASRT_RichPresence
                         State = richState,
                         Party = new Party()
                         {
-                            ID = lobbyID,
+                            ID = "party_" + lobbyID,
                             Size = lobbySize,
                             Max = 10,
                         },
@@ -411,24 +470,50 @@ namespace ASRT_RichPresence
                         {
                             LargeImageKey = trackImage,
                             LargeImageText = trackName,
+                            SmallImageKey = racemodeImage,
+                            SmallImageText = racemodeName,
                         },
                         Secrets = new Secrets()
                         {
-                            //CreateSecret = lobbyID,
-                            JoinSecret = friendlySecret2,
+                            JoinSecret = lobbyID,
                         }
                     });
- 
+
                     System.Threading.Thread.Sleep(5000);
                 }
             }
-			catch(Exception e)
+            catch (Exception e)
             {
-				MessageBox.Show(e.ToString());
+                MessageBox.Show(e.ToString());
             }
 
-			// The rich presence program will shut down when this function returns
-			return 0;
+            // The rich presence program will shut down when this function returns
+            return 0;
+        }
+
+        private static void OnJoinRequested(object sender, JoinRequestMessage args)
+        {
+            /*
+            string message = string.Format(
+                "'{0}' has requested to join our game.\n" +
+                " - User's Avatar: {1}\n" +
+                " - User's Descrim: {2}" +
+                " - User's Snowflake: {3}" +
+                "Do you give this user permission to join?", 
+                args.User.Username, args.User.GetAvatarURL(User.AvatarFormat.GIF, User.AvatarSize.x2048), args.User.ID);
+            bool accept = MessageBoxResult.Yes == MessageBox.Show(message, "Join Request", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            */
+            DiscordRpcClient client = (DiscordRpcClient)sender;
+            client.Respond(args, true);
+        }
+
+        private static void OnJoin(object sender, JoinMessage args)
+        {
+            //bool join = MessageBoxResult.Yes == MessageBox.Show("Join request accepted! Join now?", "", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            //if (join)
+            //{
+                Process.Start("steam://joinlobby/212480/" + args.Secret);
+            //}
         }
     }
 }

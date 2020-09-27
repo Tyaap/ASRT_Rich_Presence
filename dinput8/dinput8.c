@@ -1,6 +1,7 @@
 #include "dinputproxy.h"
 #include "bootstrapper.h"
 
+static int richPresenceLoaded = 0;
 
 BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason,LPVOID v)
 {
@@ -37,7 +38,11 @@ BOOL WINAPI DllMain(HINSTANCE hInst, DWORD reason,LPVOID v)
 // DirectInput8Create
 HRESULT __stdcall  __E__0__(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID * ppvOut, LPUNKNOWN punkOuter)
 {
-	CreateThread(NULL, 0, LoadManagedProject, L"RichPresence.dll", 0, NULL);
+	if (!richPresenceLoaded) // only load on the first call of DirectInput8Create
+	{
+		CreateThread(NULL, 0, LoadManagedProject, L"RichPresence.dll", 0, NULL);
+		richPresenceLoaded = 1;
+	}
 
 	proxy_IDirectInput *proxyDI;
 	IDirectInput8 *di;
