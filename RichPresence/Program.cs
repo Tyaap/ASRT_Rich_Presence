@@ -23,7 +23,7 @@ namespace ASRT_RichPresence
 				// Example event subscription
 				client.OnReady += (sender, e) =>
 				{
-					MessageBox.Show("Received Ready from user " + e.User.Username);
+	//				MessageBox.Show("Received Ready from user " + e.User.Username);
 				};
 
 
@@ -56,9 +56,6 @@ namespace ASRT_RichPresence
 				// Simple rich presence test
                 while (true)
                 {
-					System.Threading.Thread.Sleep(5000);
-
-
                     // Determine race mode
                     racemode = (ReadInt(0xBC7430) - ReadInt(0xBD0270)) / 0xB4;
                     if (racemode < 0) { racemode = 0; }
@@ -421,9 +418,10 @@ namespace ASRT_RichPresence
                             JoinSecret = friendlySecret2,
                         }
                     });
-
+ 
+                    System.Threading.Thread.Sleep(5000);
                 }
-			}
+            }
 			catch(Exception e)
             {
 				MessageBox.Show(e.ToString());
