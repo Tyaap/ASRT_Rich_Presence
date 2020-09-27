@@ -26,12 +26,21 @@ namespace ASRT_RichPresence
 					MessageBox.Show("Received Ready from user " + e.User.Username);
 				};
 
-				// Connect to the Discord IPC
-				client.Initialize();
+
+                // Connect to the Discord IPC
+                client.Initialize();
+
+                // Initial code for online support
+                client.RegisterUriScheme("212480");
+
+                // FriendlySecret
+                string friendlySecret = Secrets.CreateFriendlySecret(new Random());
+                string friendlySecret2 = "";
 
                 // Defining important variable
                 string menuState = "";
                 string trackName = "";
+                string trackImage = "";
                 int inMenu = 1;
                 int isOnlineMode = 0;
                 string lobbyID = "";
@@ -55,66 +64,87 @@ namespace ASRT_RichPresence
                             break;
                         case 0xD4257EBD:
                             trackName = "Ocean View";
+                            trackImage = "oceanview";
                             break;
                         case 0x32D305A8:
                             trackName = "Samba Studios";
+                            trackImage = "sambastudios";
                             break;
                         case 0xC72B3B98:
                             trackName = "Carrier Zone";
+                            trackImage = "carrierzone";
                             break;
                         case 0x03EB7FFF:
                             trackName = "Dragon Canyon";
+                            trackImage = "dragoncanyon";
                             break;
                         case 0xE3121777:
                             trackName = "Temple Trouble";
+                            trackImage = "templetrouble";
                             break;
                         case 0x4E015AB6:
                             trackName = "Galactic Parade";
+                            trackImage = "galacticparade";
                             break;
                         case 0x503C1CBC:
                             trackName = "Seasonal Shrines";
+                            trackImage = "seasonalshrines";
                             break;
                         case 0x7534B7CA:
                             trackName = "Rogue's Landing";
+                            trackImage = "rogueslanding";
                             break;
                         case 0x38A394ED:
                             trackName = "Dream Valley";
+                            trackImage = "dreamvalley";
                             break;
                         case 0xC5C9DEA1:
                             trackName = "Chilly Castle";
+                            trackImage = "chillycastle";
                             break;
                         case 0xD936550C:
                             trackName = "Graffity City";
+                            trackImage = "graffitycity";
                             break;
                         case 0x4A0FF7AE:
-                            trackName = "Sancturay Falls";
+                            trackName = "Sanctuary Falls";
+                            trackImage = "sanctuaryfalls";
                             break;
                         case 0xCD8017BA:
                             trackName = "Graveyard Gig";
+                            trackImage = "graveyardgig";
                             break;
                         case 0xDC93F18B:
                             trackName = "Adder's Lair";
+                            trackImage = "adderslair";
                             break;
                         case 0x2DB91FC2:
                             trackName = "Burning Depths";
+                            trackImage = "burningdepths";
                             break;
                         case 0x94610644:
                             trackName = "Race Of Ages";
+                            trackImage = "raceofages";
                             break;
                         case 0xE6CD97F0:
                             trackName = "Sunshine Tour";
+                            trackImage = "sunshinetour";
                             break;
                         case 0xE87FDF22:
                             trackName = "Shibuya Downtown";
+                            trackImage = "shibuyadowntown";
                             break;
                         case 0x17463C8D:
                             trackName = "Roulette Road";
+                            trackImage = "rouletteroad";
                             break;
                         case 0xFEBC639E:
                             trackName = "Egg Hangar";
+                            trackImage = "egghangar";
                             break;
                         case 0x1EF56CE1:
                             trackName = "Outrun Bay";
+                            trackImage = "outrunbay";
                             break;
                     }
 
@@ -173,6 +203,7 @@ namespace ASRT_RichPresence
                             richState = "Matchmaking";
                             lobbyID = ReadULong(ReadUInt(0xEC1A88) + 0x2F8).ToString();
                             lobbySize = ReadUShort(ReadUInt(0xEC1A88) + 0x525);
+                            friendlySecret2 = friendlySecret;
                         }
                         else
                         {
@@ -180,7 +211,9 @@ namespace ASRT_RichPresence
                             richState = "Game Menu";
                             lobbyID = "";
                             lobbySize = 0;
+                            friendlySecret2 = "";
                         }
+                        trackImage = "";
                     }
                     else
                     {
@@ -189,18 +222,24 @@ namespace ASRT_RichPresence
                             richState = "Matchmaking";
                             lobbyID = ReadULong(ReadUInt(0xEC1A88) + 0x2F8).ToString();
                             lobbySize = ReadUShort(ReadUInt(0xEC1A88) + 0x525);
+                            friendlySecret2 = friendlySecret;
                         }
                         else
                         {
                             richState = menuState;
                             lobbyID = "";
                             lobbySize = 0;
+                            friendlySecret2 = "";
                         }
                         richDetails = trackName;
                     }
 
-                    // Initial code for online support
-                    client.RegisterUriScheme("212480");
+
+                   
+
+
+                        //
+                    client.SetSubscription(EventType.Join | EventType.Spectate | EventType.JoinRequest);
 
                     client.SetPresence(new RichPresence()
                     {
@@ -212,11 +251,16 @@ namespace ASRT_RichPresence
                             Size = lobbySize,
                             Max = 10,
                         },
-      /*                  Secrets = new Secrets()
+                        Assets = new Assets()
+                        {
+                            LargeImageKey = trackImage,
+                            LargeImageText = trackName,
+                        },
+                        Secrets = new Secrets()
                         {
                             //CreateSecret = lobbyID,
-                            JoinSecret = lobbyID + "_salt",
-                        }*/
+                            JoinSecret = friendlySecret2,
+                        }
                     });
 
                 }
