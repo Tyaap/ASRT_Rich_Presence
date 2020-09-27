@@ -34,6 +34,8 @@ namespace ASRT_RichPresence
                 string trackName = "";
                 int inMenu = 1;
                 int isOnlineMode = 0;
+                string lobbyID = "";
+                int lobbySize = 0;
 
 
                 // Final variables for Discord RichPresence
@@ -116,6 +118,12 @@ namespace ASRT_RichPresence
                             break;
                     }
 
+                    // Determine if racing in Mirror mode
+                    if (ReadInt(0xBC744C) == 1)
+                    {
+                        trackName = trackName + " (Mirror)";
+                    }
+
 
                     // Determine if ingame or in-menu
                     if (ReadUInt(ReadUInt(ReadUInt(0xBCE920) + 0) + 0xC1B8) == 0)
@@ -162,33 +170,56 @@ namespace ASRT_RichPresence
                         if (isOnlineMode == 1)
                         {
                             richDetails = "In Lobby";
-                            richState = "Online Matchmaking";
+                            richState = "Matchmaking";
+                            lobbyID = ReadULong(ReadUInt(0xEC1A88) + 0x2F8).ToString();
+                            lobbySize = ReadUShort(ReadUInt(0xEC1A88) + 0x525);
                         }
                         else
                         {
-                            richDetails = "Game Menu";
-                            richState = "";
+                            richDetails = "";
+                            richState = "Game Menu";
+                            lobbyID = "";
+                            lobbySize = 0;
                         }
                     }
                     else
                     {
                         if (isOnlineMode == 1)
                         {
-                            richState = "Online Matchmaking";
-                        } else
+                            richState = "Matchmaking";
+                            lobbyID = ReadULong(ReadUInt(0xEC1A88) + 0x2F8).ToString();
+                            lobbySize = ReadUShort(ReadUInt(0xEC1A88) + 0x525);
+                        }
+                        else
                         {
                             richState = menuState;
+                            lobbyID = "";
+                            lobbySize = 0;
                         }
                         richDetails = trackName;
                     }
 
+                    // Initial code for online support
+                    client.RegisterUriScheme("212480");
 
                     client.SetPresence(new RichPresence()
-					{
-						Details = richDetails,
-						State = richState
-					});
-				}
+                    {
+                        Details = richDetails,
+                        State = richState,
+                        Party = new Party()
+                        {
+                            ID = lobbyID,
+                            Size = lobbySize,
+                            Max = 10,
+                        },
+      /*                  Secrets = new Secrets()
+                        {
+                            //CreateSecret = lobbyID,
+                            JoinSecret = lobbyID + "_salt",
+                        }*/
+                    });
+
+                }
 			}
 			catch(Exception e)
             {
