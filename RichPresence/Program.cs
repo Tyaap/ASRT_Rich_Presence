@@ -146,6 +146,26 @@ namespace ASRT_RichPresence
                             trackName = "Outrun Bay";
                             trackImage = "outrunbay";
                             break;
+                        case 0xB9B67B8F:
+                            trackName = "Neon Docks";
+                            trackImage = "galacticparade";
+                            break;
+                        case 0x7583BBD6:
+                            trackName = "Battle Bay";
+                            trackImage = "carrierzone";
+                            break;
+                        case 0x997E9C42:
+                            trackName = "Creepy Courtyard";
+                            trackImage = "graveyardgig";
+                            break;
+                        case 0x8DABE769:
+                            trackName = "Rooftop Rumble";
+                            trackImage = "graffitycity";
+                            break;
+                        case 0x38A73138:
+                            trackName = "Monkey Ball Park";
+                            trackImage = "templetrouble";
+                            break;
                     }
 
                     // Determine if racing in Mirror mode
