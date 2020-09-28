@@ -28,6 +28,7 @@ namespace ASRT_RichPresence
 
                 // Initial code for online support
                 client.RegisterUriScheme("212480");
+                client.SetSubscription(EventType.Join | EventType.JoinRequest);
 
                 // FriendlySecret
                 string friendlySecret = Secrets.CreateFriendlySecret(new Random());
@@ -43,11 +44,13 @@ namespace ASRT_RichPresence
                 int isOnlineMode = 0;
                 string lobbyID = "";
                 int lobbySize = 0;
-
+                DateTime startTimestamp = DateTime.Now;
 
                 // Final variables for Discord RichPresence
-                string richState = "Game Started";
+                string richState = "";
                 string richDetails = "";
+                string lastRichState = "";
+                string lastRichDetails = "";
 
                 // Simple rich presence test
                 while (true)
@@ -310,12 +313,22 @@ namespace ASRT_RichPresence
                         }
                     }
 
-                    client.SetSubscription(EventType.Join | EventType.JoinRequest);
+                    // Set timestamp
+                    if (lastRichState != lastRichState && richDetails != lastRichDetails)
+                    {
+                        startTimestamp = DateTime.Now;
+                    }
 
                     client.SetPresence(new RichPresence()
                     {
                         Details = richDetails,
                         State = richState,
+                        /* For some reason this isn't working - always shows 00:00
+                        Timestamps = new Timestamps
+                        {
+                            Start = startTimestamp
+                        },
+                        */
                         Party = new Party()
                         {
                             ID = lobbyID,
@@ -333,7 +346,7 @@ namespace ASRT_RichPresence
                         {
                             JoinSecret = lobbyID == "" ? "" : "secret_" + lobbyID,
                         }
-                    });
+                    });;
 
                     System.Threading.Thread.Sleep(5000);
                 }
