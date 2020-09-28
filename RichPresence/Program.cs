@@ -267,8 +267,6 @@ namespace ASRT_RichPresence
                             break;
                     }
 
-
-
                     // If in-menu and offline, don't show 
                     if (inMenu == 1)
                     {
@@ -277,7 +275,7 @@ namespace ASRT_RichPresence
                             richDetails = "In Lobby";
                             richState = "Matchmaking";
                             lobbyID = ReadULong(ReadUInt(0xEC1A88) + 0x2F8).ToString();
-                            lobbySize = ReadUShort(ReadUInt(0xEC1A88) + 0x525);
+                            lobbySize = determineNetworkLobbyMembers();
                         }
                         else
                         {
@@ -286,6 +284,7 @@ namespace ASRT_RichPresence
                             lobbyID = "";
                             lobbySize = 0;
                         }
+                        racemodeImage = "";
                         trackImage = "asrtransformed";
                     }
                     else
@@ -294,7 +293,7 @@ namespace ASRT_RichPresence
                         {
                             richState = "Matchmaking";
                             lobbyID = ReadULong(ReadUInt(0xEC1A88) + 0x2F8).ToString();
-                            lobbySize = ReadUShort(ReadUInt(0xEC1A88) + 0x525);
+                            lobbySize = determineNetworkLobbyMembers();
                         }
                         else
                         {
@@ -355,6 +354,17 @@ namespace ASRT_RichPresence
 
             // The rich presence program will shut down when this function returns
             return 0;
+        }
+
+        public static int determineNetworkLobbyMembers()
+        {
+            int connectedClients = ReadUShort(ReadUInt(0xEC1A88) + 0x525);
+            int total = 0;
+            for (int i = 0; i < connectedClients; i++)
+            {
+                total += ReadUShort(ReadUInt((uint)(ReadUInt(0xEC1A88) + 0x528 + i * 4)) + 0x25D0);
+            }
+            return total;
         }
 
         private static void OnJoin(object sender, JoinMessage args)

@@ -16,12 +16,12 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4C5DA8B1-52AE-4D21-AAAF-64FC5E197475}.Debug|x86.ActiveCfg = Debug|Win32
-		{4C5DA8B1-52AE-4D21-AAAF-64FC5E197475}.Debug|x86.Build.0 = Debug|Win32
+		{4C5DA8B1-52AE-4D21-AAAF-64FC5E197475}.Debug|x86.ActiveCfg = Release|Win32
+		{4C5DA8B1-52AE-4D21-AAAF-64FC5E197475}.Debug|x86.Build.0 = Release|Win32
 		{4C5DA8B1-52AE-4D21-AAAF-64FC5E197475}.Release|x86.ActiveCfg = Release|Win32
 		{4C5DA8B1-52AE-4D21-AAAF-64FC5E197475}.Release|x86.Build.0 = Release|Win32
-		{CE6B1B17-5BF7-445D-9FAC-3C08B1B0B537}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{CE6B1B17-5BF7-445D-9FAC-3C08B1B0B537}.Debug|x86.Build.0 = Debug|Any CPU
+		{CE6B1B17-5BF7-445D-9FAC-3C08B1B0B537}.Debug|x86.ActiveCfg = Release|Any CPU
+		{CE6B1B17-5BF7-445D-9FAC-3C08B1B0B537}.Debug|x86.Build.0 = Release|Any CPU
 		{CE6B1B17-5BF7-445D-9FAC-3C08B1B0B537}.Release|x86.ActiveCfg = Release|Any CPU
 		{CE6B1B17-5BF7-445D-9FAC-3C08B1B0B537}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
