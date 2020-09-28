@@ -21,8 +21,7 @@ namespace ASRT_RichPresence
 
                 // Create a rich presence client
                 client = new DiscordRpcClient("759459364951031821");
-                client.OnJoinRequested += OnJoinRequested;
-
+                client.OnJoin += OnJoin;
 
                 // Connect to the Discord IPC
                 client.Initialize();
@@ -419,7 +418,6 @@ namespace ASRT_RichPresence
                             richState = "Matchmaking";
                             lobbyID = ReadULong(ReadUInt(0xEC1A88) + 0x2F8).ToString();
                             lobbySize = ReadUShort(ReadUInt(0xEC1A88) + 0x525);
-                            friendlySecret2 = friendlySecret;
                         }
                         else
                         {
@@ -427,7 +425,6 @@ namespace ASRT_RichPresence
                             richState = "Game Menu";
                             lobbyID = "";
                             lobbySize = 0;
-                            friendlySecret2 = "";
                         }
                         trackImage = "asrtransformed";
                     }
@@ -438,14 +435,12 @@ namespace ASRT_RichPresence
                             richState = "Matchmaking";
                             lobbyID = ReadULong(ReadUInt(0xEC1A88) + 0x2F8).ToString();
                             lobbySize = ReadUShort(ReadUInt(0xEC1A88) + 0x525);
-                            friendlySecret2 = friendlySecret;
                         }
                         else
                         {
                             richState = menuState;
                             lobbyID = "";
                             lobbySize = 0;
-                            friendlySecret2 = "";
                         }
 
                         if (richState != racemodeName)
@@ -462,7 +457,7 @@ namespace ASRT_RichPresence
                         State = richState,
                         Party = new Party()
                         {
-                            ID = "party_" + lobbyID,
+                            ID = lobbyID,
                             Size = lobbySize,
                             Max = 10,
                         },
@@ -475,7 +470,7 @@ namespace ASRT_RichPresence
                         },
                         Secrets = new Secrets()
                         {
-                            JoinSecret = lobbyID,
+                            JoinSecret = lobbyID == "" ? "" : "secret_" + lobbyID,
                         }
                     });
 
@@ -491,29 +486,9 @@ namespace ASRT_RichPresence
             return 0;
         }
 
-        private static void OnJoinRequested(object sender, JoinRequestMessage args)
-        {
-            /*
-            string message = string.Format(
-                "'{0}' has requested to join our game.\n" +
-                " - User's Avatar: {1}\n" +
-                " - User's Descrim: {2}" +
-                " - User's Snowflake: {3}" +
-                "Do you give this user permission to join?", 
-                args.User.Username, args.User.GetAvatarURL(User.AvatarFormat.GIF, User.AvatarSize.x2048), args.User.ID);
-            bool accept = MessageBoxResult.Yes == MessageBox.Show(message, "Join Request", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            */
-            DiscordRpcClient client = (DiscordRpcClient)sender;
-            client.Respond(args, true);
-        }
-
         private static void OnJoin(object sender, JoinMessage args)
         {
-            //bool join = MessageBoxResult.Yes == MessageBox.Show("Join request accepted! Join now?", "", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            //if (join)
-            //{
-                Process.Start("steam://joinlobby/212480/" + args.Secret);
-            //}
+            Process.Start("steam://joinlobby/212480/" + args.Secret.Substring(7));
         }
     }
 }
