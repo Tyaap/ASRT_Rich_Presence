@@ -314,10 +314,12 @@ namespace ASRT_RichPresence
                     }
 
                     // Set timestamp
-                    if (lastRichState != lastRichState && richDetails != lastRichDetails)
+                    if (lastRichState != richState || richDetails != lastRichDetails)
                     {
                         startTimestamp = DateTime.Now;
                     }
+                    lastRichState = richState;
+                    lastRichDetails = richDetails;
 
                     client.SetPresence(new RichPresence()
                     {
