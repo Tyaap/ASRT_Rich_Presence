@@ -44,7 +44,7 @@ namespace ASRT_RichPresence
                 int isOnlineMode = 0;
                 string lobbyID = "";
                 int lobbySize = 0;
-                DateTime startTimestamp = DateTime.Now;
+                DateTime startTimestamp = DateTime.UtcNow;
 
                 // Final variables for Discord RichPresence
                 string richState = "";
@@ -316,7 +316,7 @@ namespace ASRT_RichPresence
                     // Set timestamp
                     if (lastRichState != richState || richDetails != lastRichDetails)
                     {
-                        startTimestamp = DateTime.Now;
+                        startTimestamp = DateTime.UtcNow;
                     }
                     lastRichState = richState;
                     lastRichDetails = richDetails;
@@ -325,12 +325,11 @@ namespace ASRT_RichPresence
                     {
                         Details = richDetails,
                         State = richState,
-                        /* For some reason this isn't working - always shows 00:00
                         Timestamps = new Timestamps
                         {
                             Start = startTimestamp
                         },
-                        */
+                        
                         Party = new Party()
                         {
                             ID = lobbyID,
