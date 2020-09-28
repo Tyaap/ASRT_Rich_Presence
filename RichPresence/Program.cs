@@ -1,7 +1,4 @@
-﻿using DiscordRPC;
-using DiscordRPC.Logging;
-using DiscordRPC.Message;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Windows;
 using static MemoryHelper;
@@ -10,7 +7,8 @@ namespace ASRT_RichPresence
 {
     class Program
     {
-        public DiscordRpcClient client;
+        public Discord.Discord client;
+        public Discord.ActivityManager activityManager;
         public int Run()
         {
             // The main thread, where the rich presence magic will happen :)
@@ -19,20 +17,11 @@ namespace ASRT_RichPresence
                 // Initialise game memory access
                 MemoryHelper.Initialise();
 
-                // Create a rich presence client
-                client = new DiscordRpcClient("759459364951031821");
-                client.OnJoin += OnJoin;
+                // Create a client
+                client = new Discord.Discord(759459364951031821, (UInt64)Discord.CreateFlags.Default);
+                activityManager = client.GetActivityManager();
 
-                // Connect to the Discord IPC
-                client.Initialize();
-
-                // Initial code for online support
-                client.RegisterUriScheme("212480");
-                client.SetSubscription(EventType.Join | EventType.JoinRequest);
-
-                // FriendlySecret
-                string friendlySecret = Secrets.CreateFriendlySecret(new Random());
-                string friendlySecret2 = "";
+                activityManager.OnActivityJoin += OnJoin;
 
                 // Defining important variable
                 string menuState = "";
@@ -55,6 +44,9 @@ namespace ASRT_RichPresence
                 // Simple rich presence test
                 while (true)
                 {
+                    // Run Discord callbacks - just like the Steam API
+                    client.RunCallbacks();
+
                     // Determine race mode
                     // Todo: upload the images!
                     switch (ReadUInt(ReadUInt(0xBCE914) + 0x38))
@@ -321,35 +313,47 @@ namespace ASRT_RichPresence
                     lastRichState = richState;
                     lastRichDetails = richDetails;
 
-                    client.SetPresence(new RichPresence()
+                    activityManager.UpdateActivity(new Discord.Activity
                     {
                         Details = richDetails,
                         State = richState,
-                        Timestamps = new Timestamps
+                        Timestamps =
                         {
-                            Start = startTimestamp
+                            Start = ToUnixTime(startTimestamp),
                         },
-                        
-                        Party = new Party()
+                        Assets =
                         {
-                            ID = lobbyID,
-                            Size = lobbySize,
-                            Max = 10,
+                            LargeImage = trackImage,
+                            LargeText = trackName,
+                            SmallImage = racemodeImage,
+                            SmallText = racemodeName,
                         },
-                        Assets = new Assets()
+                        Party =
                         {
-                            LargeImageKey = trackImage,
-                            LargeImageText = trackName,
-                            SmallImageKey = racemodeImage,
-                            SmallImageText = racemodeName,
+                            Id = lobbyID,
+                            Size = {
+                                CurrentSize = lobbySize,
+                                MaxSize = 10,
+                            }
                         },
-                        Secrets = new Secrets()
+                        Secrets =
                         {
-                            JoinSecret = lobbyID == "" ? "" : "secret_" + lobbyID,
+                            Join = lobbyID == "" ? "" : "secret_" + lobbyID,
                         }
-                    });;
+                    },
+                    // The API requires a function that is run after attempting to update the activity
+                    (result) => {
+                        if (result == Discord.Result.Ok)
+                        {
+                            MessageBox.Show("Success!");
+                        }
+                        else
+                        {
+                            MessageBox.Show("Failed");
+                        }
+                    });; 
 
-                    System.Threading.Thread.Sleep(5000);
+                    System.Threading.Thread.Sleep(1000);
                 }
             }
             catch (Exception e)
@@ -361,9 +365,15 @@ namespace ASRT_RichPresence
             return 0;
         }
 
-        private static void OnJoin(object sender, JoinMessage args)
+        private static void OnJoin(string secret)
         {
-            Process.Start("steam://joinlobby/212480/" + args.Secret.Substring(7));
+            Process.Start("steam://joinlobby/212480/" + secret.Substring(7));
+        }
+
+        public static long ToUnixTime(DateTime date)
+        {
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            return Convert.ToInt64((date - epoch).TotalSeconds);
         }
     }
 }
