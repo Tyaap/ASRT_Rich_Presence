@@ -30,10 +30,6 @@ namespace ASRT_RichPresence
                 client.RegisterUriScheme("212480");
                 client.SetSubscription(EventType.Join | EventType.JoinRequest);
 
-                // FriendlySecret
-                string friendlySecret = Secrets.CreateFriendlySecret(new Random());
-                string friendlySecret2 = "";
-
                 // Defining important variable
                 string menuState = "";
                 string trackName = "";
