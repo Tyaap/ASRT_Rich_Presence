@@ -52,144 +52,8 @@ namespace ASRT_RichPresence
                 // Simple rich presence test
                 while (true)
                 {
-
-
-                    /*
                     // Determine race mode
-                    racemode = (ReadInt(0xBC7430) - ReadInt(0xBD0270)) / 0xB4;
-                    if (racemode < 0) { racemode = 0; }
-                    switch (racemode)
-                    {
-                        case 0:
-                            racemodeText = "Delphinus Defence";
-                            break;
-                        case 1:
-                            racemodeText = "Time Attack";
-                            break;
-                        case 2:
-                            racemodeText = "Grand Prix";
-                            break;
-                        case 3:
-                            racemodeText = "Delphinus Defence";
-                            break;
-                        case 4:
-                            racemodeText = "Race";
-                            break;
-                        case 5:
-                            racemodeText = "Race";
-                            break;
-                        case 6:
-                            racemodeText = "Time Attack";
-                            break;
-                        case 7:
-                            racemodeText = "Delphinus Defence";
-                            break;
-                        case 8:
-                            racemodeText = "Delphinus Defence";
-                            break;
-                        case 9:
-                            racemodeText = "Delphinus Defence";
-                            break;
-                        case 10:
-                            racemodeText = "Delphinus Defence";
-                            break;
-                        case 11:
-                            racemodeText = "Delphinus Defence";
-                            break;
-                        case 12:
-                            racemodeText = "Delphinus Defence";
-                            break;
-                        // case 13 crashes the game
-                        case 14:
-                            racemodeText = "Race";
-                            break;
-                        case 15:
-                            racemodeText = "Battle";
-                            break;
-                        case 16:
-                            racemodeText = "Battle";
-                            break;
-                        case 17:
-                            racemodeText = "Battle Race";
-                            break;
-                        case 18:
-                            racemodeText = "Capture The Chao";
-                            break;
-                        case 19:
-                            racemodeText = "Capture The Chao";
-                            break;
-                        case 20:
-                            racemodeText = "Target Smash";
-                            break;
-                        case 21:
-                            racemodeText = "Boost Challenge";
-                            break;
-                        case 22:
-                            racemodeText = "Boost Race";
-                            break;
-                        case 23:
-                            racemodeText = "Crazy Conga";
-                            break;
-                        case 24:
-                            racemodeText = "Crazy Conga";
-                            break;
-                        case 25:
-                            racemodeText = "Time Attack";
-                            break;
-                        case 26:
-                            racemodeText = "Sprint";
-                            break;
-                        case 27:
-                            racemodeText = "Delphinus Defence";
-                            break;
-                        case 28:
-                            racemodeText = "Pursuit";
-                            break;
-                        case 29:
-                            racemodeText = "Delphinus Defence";
-                            break;
-                        case 30:
-                            racemodeText = "Delphinus Defence";
-                            break;
-                        case 31:
-                            racemodeText = "Delphinus Defence";
-                            break;
-                        case 32:
-                            racemodeText = "Drift Challenge";
-                            break;
-                        case 33:
-                            racemodeText = "Traffic Attack";
-                            break;
-                        case 34:
-                            racemodeText = "Delphinus Defence";
-                            break;
-                        case 35:
-                            racemodeText = "Delphinus Defence";
-                            break;
-                        case 36:
-                            racemodeText = "Versus";
-                            break;
-                        case 37:
-                            racemodeText = "Traffic Attack?";
-                            break;
-                        case 38:
-                            racemodeText = "Golden Axe";
-                            break;
-                        case 39:
-                            racemodeText = "Delphinus Defence / Skies of arcadia";
-                            break;
-                        case 40:
-                            racemodeText = "Ring Race";
-                            break;
-                        case 41:
-                            racemodeText = "Delphinus Defence / All Star";
-                            break;
-                        case 42:
-                            racemodeText = "Jet Set Tag";
-                            break;
-                    }
-                    */
-
+                    // Todo: upload the images!
                     switch (ReadUInt(ReadUInt(0xBCE914) + 0x38))
                     {
                         case 0x4AFC561D:
@@ -253,9 +117,6 @@ namespace ASRT_RichPresence
                     // Determine track name
                     switch (ReadUInt(ReadUInt(0xBC7434) + 0))
                     {
-                        case 0:
-                            trackName = "Dummy";
-                            break;
                         case 0xD4257EBD:
                             trackName = "Ocean View";
                             trackImage = "oceanview";
