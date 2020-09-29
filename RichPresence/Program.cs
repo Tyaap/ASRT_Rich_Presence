@@ -286,6 +286,7 @@ namespace ASRT_RichPresence
                         }
                         racemodeImage = "";
                         trackImage = "asrtransformed";
+                        trackName = "";
                     }
                     else
                     {
