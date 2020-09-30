@@ -228,7 +228,6 @@ namespace ASRT_RichPresence
                         trackName = trackName + " (Mirror)";
                     }
 
-
                     // Determine if ingame or in-menu
                     if (ReadUInt(ReadUInt(ReadUInt(0xBCE920) + 0) + 0xC1B8) == 0)
                     {
@@ -249,7 +248,6 @@ namespace ASRT_RichPresence
                         isOnlineMode = 1;
                     }
 
-
                     // Determine menu state
                     switch (ReadInt(0xC56890))
                     {
@@ -267,45 +265,62 @@ namespace ASRT_RichPresence
                             break;
                     }
 
-                    // If in-menu and offline, don't show 
-                    if (inMenu == 1)
+                    // Online / offline states
+                    if (isOnlineMode == 1)
                     {
-                        if (isOnlineMode == 1)
+                        lobbyID = ReadULong(ReadUInt(0xEC1A88) + 0x2F8).ToString();
+                        lobbySize = determineNetworkLobbyMembers();
+
+                        if (inMenu == 1)
                         {
                             richDetails = "In Lobby";
-                            richState = "Matchmaking";
-                            lobbyID = ReadULong(ReadUInt(0xEC1A88) + 0x2F8).ToString();
-                            lobbySize = determineNetworkLobbyMembers();
+                            trackName = "";
+                            trackImage = "asrtransformed";
+                            racemodeName = "Online";
+                            racemodeImage = "online";
                         }
                         else
                         {
-                            richDetails = "";
-                            richState = "Game Menu";
-                            lobbyID = "";
-                            lobbySize = 0;
+                            richDetails = racemodeName;
                         }
-                        racemodeImage = "";
-                        trackImage = "asrtransformed";
-                        trackName = "";
+
+                        // Determine online mode
+                        switch ((ReadULong(ReadUInt(0xEC1A88) + 0x101D6C) & 0x3F) - 13)
+                        {
+                            case 0:
+                                richState = "Matchmaking"; // not sure what else to put here
+                                break;
+                            case 1:
+                                richState = "Arena";
+                                break;
+                            case 2:
+                                richState = "Lucky Dip";
+                                break;
+                            case 3:
+                                richState = "Custom Game";
+                                break;
+                        }
                     }
                     else
                     {
-                        if (isOnlineMode == 1)
+                        lobbyID = "";
+                        lobbySize = 0;
+                        richDetails = "";
+                        if (inMenu == 1)
                         {
-                            richState = "Matchmaking";
-                            lobbyID = ReadULong(ReadUInt(0xEC1A88) + 0x2F8).ToString();
-                            lobbySize = determineNetworkLobbyMembers();
+                            richState = "Game Menu";
+                            trackName = "";
+                            trackImage = "asrtransformed";
+                            racemodeName = "";
+                            racemodeImage = "";
                         }
-                        else
+                        else 
                         {
                             richState = menuState;
-                            lobbyID = "";
-                            lobbySize = 0;
-                        }
-
-                        if (richState != racemodeName)
-                        {
-                            richDetails = racemodeName;
+                            if (richState != racemodeName) // prevent repeating information
+                            {
+                                richDetails = racemodeName;
+                            }
                         }
                     }
 
