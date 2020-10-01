@@ -3,6 +3,7 @@ using DiscordRPC.Logging;
 using DiscordRPC.Message;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using static MemoryHelper;
 
@@ -26,7 +27,7 @@ namespace ASRT_RichPresence
                 client.Initialize();
 
                 // Initial code for online support
-                client.RegisterUriScheme("212480");
+                client.RegisterUriScheme(executable: Directory.GetCurrentDirectory() + "\\LaunchGame.exe");
                 client.SetSubscription(EventType.Join);
                 client.OnJoin += OnJoin;
 
