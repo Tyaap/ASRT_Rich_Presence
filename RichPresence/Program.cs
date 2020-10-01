@@ -21,14 +21,14 @@ namespace ASRT_RichPresence
 
                 // Create a rich presence client
                 client = new DiscordRpcClient("759459364951031821");
-                client.OnJoin += OnJoin;
 
                 // Connect to the Discord IPC
                 client.Initialize();
 
                 // Initial code for online support
                 client.RegisterUriScheme("212480");
-                client.SetSubscription(EventType.Join | EventType.JoinRequest);
+                client.SetSubscription(EventType.Join);
+                client.OnJoin += OnJoin;
 
                 // Defining important variable
                 string menuState = "";
@@ -36,8 +36,8 @@ namespace ASRT_RichPresence
                 string trackImage = "";
                 string racemodeName = "";
                 string racemodeImage = "";
-                int inMenu = 1;
-                int isOnlineMode = 0;
+                bool inMenu = true;
+                bool isOnlineMode = false;
                 string lobbyID = "";
                 int lobbySize = 0;
                 DateTime startTimestamp = DateTime.UtcNow;
@@ -177,7 +177,7 @@ namespace ASRT_RichPresence
                             trackImage = "burningdepths";
                             break;
                         case 0x94610644:
-                            trackName = "Race Of Ages";
+                            trackName = "Race of AGES";
                             trackImage = "raceofages";
                             break;
                         case 0xE6CD97F0:
@@ -229,33 +229,73 @@ namespace ASRT_RichPresence
                     }
 
                     // Determine if ingame or in-menu
-                    if (ReadUInt(ReadUInt(ReadUInt(0xBCE920) + 0) + 0xC1B8) == 0)
-                    {
-                        inMenu = 1;
-                    }
-                    else
-                    {
-                        inMenu = 0;
-                    }
+                    inMenu = (ReadInt(0xE9A92C) == 0) && (ReadInt(ReadInt(ReadInt(0xBCE920) + 0) + 0xC1B8) == 0);
 
                     // Determine if in online mode or not
-                    if (ReadUShort(ReadUInt(0xEC1A88) + 0x525) == 0)
-                    {
-                        isOnlineMode = 0;
-                    }
-                    else
-                    {
-                        isOnlineMode = 1;
-                    }
+                    isOnlineMode = ReadUShort(ReadUInt(0xEC1A88) + 0x525) != 0;
 
                     // Determine menu state
                     switch (ReadInt(0xC56890))
                     {
                         case 0:
-                            menuState = "World Tour";
+                            // Determine tour
+                            switch (ReadInt(0xC55F1C))
+                            {
+                                case 0:
+                                    menuState = "Sunshine Coast";
+                                    break;
+                                case 1:
+                                    menuState = "Frozen Valley";
+                                    break;
+                                case 2:
+                                    menuState = "Scorching Skies";
+                                    break;
+                                case 3:
+                                    menuState = "Twilight Engine";
+                                    break;
+                                case 4:
+                                    menuState = "Moonlight Park";
+                                    break;
+                                case 5:
+                                    menuState = "Superstar Showdown";
+                                    break;
+                            }
                             break;
                         case 1:
-                            menuState = "Grand Prix";
+                            // Determine Grand Prix
+                            switch (ReadInt(0xC51D44))
+                            {
+                                case 0:
+                                    menuState = "Dragon Cup";
+                                    break;
+                                case 1:
+                                    menuState = "Rogue Cup";
+                                    break;
+                                case 2:
+                                    menuState = "Emerald Cup";
+                                    break;
+                                case 3:
+                                    menuState = "Arcade Cup";
+                                    break;
+                                case 4:
+                                    menuState = "Classic Cup";
+                                    break;
+                                case 5:
+                                    menuState = "Dragon Cup (Mirror)";
+                                    break;
+                                case 6:
+                                    menuState = "Rogue Cup (Mirror)";
+                                    break;
+                                case 7:
+                                    menuState = "Emerald Cup (Mirror)";
+                                    break;
+                                case 8:
+                                    menuState = "Arcade Cup (Mirror)";
+                                    break;
+                                case 9:
+                                    menuState = "Classic Cup (Mirror)";
+                                    break;
+                            }
                             break;
                         case 2:
                             menuState = "Time Attack";
@@ -266,12 +306,12 @@ namespace ASRT_RichPresence
                     }
 
                     // Online / offline states
-                    if (isOnlineMode == 1)
+                    if (isOnlineMode)
                     {
                         lobbyID = ReadULong(ReadUInt(0xEC1A88) + 0x2F8).ToString();
-                        lobbySize = determineNetworkLobbyMembers();
+                        lobbySize = DetermineNetworkLobbyMembers();
 
-                        if (inMenu == 1)
+                        if (inMenu)
                         {
                             richDetails = "In Lobby";
                             trackName = "";
@@ -288,16 +328,20 @@ namespace ASRT_RichPresence
                         switch ((ReadULong(ReadUInt(0xEC1A88) + 0x101D6C) & 0x3F) - 13)
                         {
                             case 0:
-                                richState = "Matchmaking"; // not sure what else to put here
+                                richState = "MM Race";
+                                if (!inMenu)
+                                {
+                                    richDetails = ""; // already know they are playing single race
+                                }
                                 break;
                             case 1:
-                                richState = "Arena";
+                                richState = "MM Arena";
                                 break;
                             case 2:
                                 richState = "Lucky Dip";
                                 break;
                             case 3:
-                                richState = "Custom Game";
+                                racemodeName = "Custom Game";
                                 break;
                         }
                     }
@@ -306,7 +350,7 @@ namespace ASRT_RichPresence
                         lobbyID = "";
                         lobbySize = 0;
                         richDetails = "";
-                        if (inMenu == 1)
+                        if (inMenu)
                         {
                             richState = "Game Menu";
                             trackName = "";
@@ -317,7 +361,7 @@ namespace ASRT_RichPresence
                         else 
                         {
                             richState = menuState;
-                            if (richState != racemodeName) // prevent repeating information
+                            if (racemodeName != richState && racemodeName != "Grand Prix") // prevent repeating information
                             {
                                 richDetails = racemodeName;
                             }
@@ -372,7 +416,7 @@ namespace ASRT_RichPresence
             return 0;
         }
 
-        public static int determineNetworkLobbyMembers()
+        public static int DetermineNetworkLobbyMembers()
         {
             int connectedClients = ReadUShort(ReadUInt(0xEC1A88) + 0x525);
             int total = 0;
