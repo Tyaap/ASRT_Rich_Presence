@@ -365,7 +365,7 @@ namespace ASRT_RichPresence
                                 richState = "Lucky Dip";
                                 break;
                             case 3:
-                                racemodeName = "Custom Game";
+                                richState = "Custom Game";
                                 break;
                         }
                     }
