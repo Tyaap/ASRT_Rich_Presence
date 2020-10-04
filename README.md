@@ -8,6 +8,7 @@
    - `RichPresence.dll`
    - `DiscordRPC.dll`
    - `Newtonsoft.Json.dll`
+   - `LaunchGame.exe`
 3. Make sure S&ASRT is added as an app in the Discord desktop client.
 4. Run the game and check your Discord status!
 
