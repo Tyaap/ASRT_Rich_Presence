@@ -158,8 +158,8 @@ namespace ASRT_RichPresence
                             trackImage = "chillycastle";
                             break;
                         case 0xD936550C:
-                            trackName = "Graffity City";
-                            trackImage = "graffitycity";
+                            trackName = "Graffiti City";
+                            trackImage = "graffiticity";
                             break;
                         case 0x4A0FF7AE:
                             trackName = "Sanctuary Falls";
@@ -203,23 +203,23 @@ namespace ASRT_RichPresence
                             break;
                         case 0xB9B67B8F:
                             trackName = "Neon Docks";
-                            trackImage = "galacticparade";
+                            trackImage = "neondocks";
                             break;
                         case 0x7583BBD6:
                             trackName = "Battle Bay";
-                            trackImage = "carrierzone";
+                            trackImage = "battlebay";
                             break;
                         case 0x997E9C42:
                             trackName = "Creepy Courtyard";
-                            trackImage = "graveyardgig";
+                            trackImage = "creepycourtyard";
                             break;
                         case 0x8DABE769:
                             trackName = "Rooftop Rumble";
-                            trackImage = "graffitycity";
+                            trackImage = "rooftoprumble";
                             break;
                         case 0x38A73138:
                             trackName = "Monkey Ball Park";
-                            trackImage = "templetrouble";
+                            trackImage = "monkeyballpark";
                             break;
                     }
 
