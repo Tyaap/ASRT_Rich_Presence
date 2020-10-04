@@ -37,6 +37,7 @@ namespace ASRT_RichPresence
                 string trackImage = "";
                 string racemodeName = "";
                 string racemodeImage = "";
+                string extraInfo = "";
                 bool inMenu = true;
                 bool isOnlineMode = false;
                 string lobbyID = "";
@@ -54,31 +55,42 @@ namespace ASRT_RichPresence
                 {
                     // Determine race mode
                     // Todo: upload the images!
+                    extraInfo = "";
                     switch (ReadUInt(ReadUInt(0xBCE914) + 0x38))
                     {
                         case 0x4AFC561D:
                             racemodeName = "Single Race";
+                            int position = DetermineRacePosition();
+                            if (position > 0)
+                            {
+                                extraInfo = position + GetOrdinal(position) + " place";
+                            }
                             racemodeImage = "singlerace";
                             break;
                         case 0x447473BC:
                             racemodeName = "Battle Arena";
                             racemodeImage = "battlearena";
+                            // todo: extraInfo = "[number] lives" or "ghosted"
                             break;
                         case 0xE64B5DD8:
                             racemodeName = "Battle Race";
                             racemodeImage = "battlerace";
+                            // todo: extraInfo = "[number] lives" or "ghosted"
                             break;
                         case 0xCCB41574:
                             racemodeName = "Capture the Chao";
                             racemodeImage = "capturethechao";
+                            // todo: extraInfo = "[number] captured"
                             break;
                         case 0x3CBA89B4:
                             racemodeName = "Boost Challenge";
                             racemodeImage = "boostchallenge";
+                            // todo: extraInfo = "checkpoint [number]/[number]"
                             break;
                         case 0x79E12D5C:
                             racemodeName = "Time Attack";
                             racemodeImage = "timeattack";
+                            // todo: extraInfo = "PB [time]"
                             break;
                         case 0x77E95ADC:
                             racemodeName = "Sprint";
@@ -87,29 +99,40 @@ namespace ASRT_RichPresence
                         case 0xBC7C19CF:
                             racemodeName = "Persuit";
                             racemodeImage = "persuit";
+                            // todo: extraInfo = tank health?
                             break;
                         case 0xB06F818B:
                             racemodeName = "Drift Challenge";
                             racemodeImage = "driftchallenge";
+                            // todo: extraInfo = "checkpoint [number]/[number]"
                             break;
                         case 0x9FBFB99B:
                             racemodeName = "Traffic Attack";
                             racemodeImage = "trafficattack";
+                            // todo: extraInfo = "checkpoint [number]/[number]"
                             break;
                         case 0xEC587062:
                             racemodeName = "Versus";
                             racemodeImage = "versus";
+                            // todo: extraInfo = "opponent [number]/[number]"
                             break;
                         case 0x091F29F4:
                             racemodeName = "Grand Prix";
                             racemodeImage = "gprace";
+                            // todo: extraInfo = "race [number]/4"
                             break;
                         case 0xAD538D8D:
                             racemodeName = "Ring Race";
                             racemodeImage = "ringrace";
+                            // todo: extraInfo = "checkpoint [number]/[number]"
                             break;
                         case 0x61FF5D42:
                             racemodeName = "Boost Race";
+                            int position2 = DetermineRacePosition();
+                            if (position2 > 0)
+                            {
+                                extraInfo = position2 + GetOrdinal(position2) + " place";
+                            }
                             racemodeImage = "boostrace";
                             break;
                     }
@@ -350,10 +373,10 @@ namespace ASRT_RichPresence
                     {
                         lobbyID = "";
                         lobbySize = 0;
-                        richDetails = "";
                         if (inMenu)
                         {
                             richState = "Game Menu";
+                            richDetails = "";
                             trackName = "";
                             trackImage = "asrtransformed";
                             racemodeName = "";
@@ -362,20 +385,34 @@ namespace ASRT_RichPresence
                         else 
                         {
                             richState = menuState;
-                            if (racemodeName != richState && racemodeName != "Grand Prix") // prevent repeating information
+                            if (racemodeName != menuState && racemodeName != "Grand Prix") // prevent repeating information
                             {
+                                
                                 richDetails = racemodeName;
                             }
                         }
                     }
 
                     // Set timestamp
-                    if (lastRichState != richState || richDetails != lastRichDetails)
+                    if ((lastRichState != richState || richDetails != lastRichDetails))
                     {
                         startTimestamp = DateTime.UtcNow;
                     }
                     lastRichState = richState;
                     lastRichDetails = richDetails;
+
+                    // Add extra racemode info
+                    if (extraInfo != "")
+                    {
+                        if (richDetails != "")
+                        {
+                            richDetails += " - " + extraInfo;
+                        }
+                        else
+                        {
+                            richState += " - " + extraInfo;
+                        }
+                    }
 
                     client.SetPresence(new RichPresence()
                     {
@@ -426,6 +463,35 @@ namespace ASRT_RichPresence
                 total += ReadUShort(ReadUInt((uint)(ReadUInt(0xEC1A88) + 0x528 + i * 4)) + 0x25D0);
             }
             return total;
+        }
+
+        public static int DetermineRacePosition()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                int playerPtr = ReadInt(ReadInt(0xBCE920) + i * 4);
+                if (playerPtr != 0 && ReadInt(playerPtr + 0xC878) == 0)
+                {
+                    int position = ReadInt(ReadInt(playerPtr + 0xC1B8) + 0x14) + 1;
+                    return position <= 10 ? position : 0;
+                }
+            }
+            return 0;
+        }
+
+        public static string GetOrdinal(int n)
+        {
+            switch (n)
+            {
+                case 1:
+                    return "st";
+                case 2:
+                    return "nd";
+                case 3:
+                    return "rd";
+                default:
+                    return "th";
+            }
         }
 
         private static void OnJoin(object sender, JoinMessage args)
