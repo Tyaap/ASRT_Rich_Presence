@@ -37,12 +37,14 @@ namespace ASRT_RichPresence
                 string trackImage = "";
                 string racemodeName = "";
                 string racemodeImage = "";
-                string extraInfo = "";
+                string richStateExtra= "";
+                string richDetailsExtra = "";
                 bool inMenu = true;
                 bool isOnlineMode = false;
                 string lobbyID = "";
                 int lobbySize = 0;
                 DateTime startTimestamp = DateTime.UtcNow;
+                int playerRating = 0;
 
                 // Final variables for Discord RichPresence
                 string richState = "";
@@ -54,33 +56,30 @@ namespace ASRT_RichPresence
                 while (true)
                 {
                     // Determine race mode
-                    // Todo: upload the images!
-                    extraInfo = "";
+                    // Todo: finish uploading the images!
+                    richStateExtra = "";
+                    richDetailsExtra = "";
                     switch (ReadUInt(ReadUInt(0xBCE914) + 0x38))
                     {
                         case 0x4AFC561D:
                             racemodeName = "Single Race";
-                            int position = DetermineRacePosition();
-                            if (position > 0)
-                            {
-                                extraInfo = position + GetOrdinal(position) + " place";
-                            }
                             racemodeImage = "singlerace";
+                            richDetailsExtra = GetRaceInfo();
                             break;
                         case 0x447473BC:
                             racemodeName = "Battle Arena";
                             racemodeImage = "battlearena";
-                            // todo: extraInfo = "[number] lives" or "ghosted"
+                            richDetailsExtra = GetBattleInfo(false);
                             break;
                         case 0xE64B5DD8:
                             racemodeName = "Battle Race";
                             racemodeImage = "battlerace";
-                            // todo: extraInfo = "[number] lives" or "ghosted"
+                            richDetailsExtra = GetBattleInfo(true);
                             break;
                         case 0xCCB41574:
                             racemodeName = "Capture the Chao";
                             racemodeImage = "capturethechao";
-                            // todo: extraInfo = "[number] captured"
+                            richDetailsExtra = GetChaoInfo();
                             break;
                         case 0x3CBA89B4:
                             racemodeName = "Boost Challenge";
@@ -90,7 +89,10 @@ namespace ASRT_RichPresence
                         case 0x79E12D5C:
                             racemodeName = "Time Attack";
                             racemodeImage = "timeattack";
-                            // todo: extraInfo = "PB [time]"
+                            string pb = GetTimeString(ReadFloat(ReadInt(0xBCE910) + 0x12C));
+                            string sb = GetTimeString(ReadFloat(ReadInt(0xBCE910) + 0x130));
+                            richDetailsExtra = pb != "" ? "PB: " + pb : "";
+                            richStateExtra = sb != "" ? "Session Best: " + sb : "";
                             break;
                         case 0x77E95ADC:
                             racemodeName = "Sprint";
@@ -128,12 +130,8 @@ namespace ASRT_RichPresence
                             break;
                         case 0x61FF5D42:
                             racemodeName = "Boost Race";
-                            int position2 = DetermineRacePosition();
-                            if (position2 > 0)
-                            {
-                                extraInfo = position2 + GetOrdinal(position2) + " place";
-                            }
                             racemodeImage = "boostrace";
+                            richDetailsExtra = GetRaceInfo();
                             break;
                     }
 
@@ -253,7 +251,7 @@ namespace ASRT_RichPresence
                     }
 
                     // Determine if ingame or in-menu
-                    inMenu = (ReadInt(0xE9A92C) == 0) && (ReadInt(ReadInt(ReadInt(0xBCE920) + 0) + 0xC1B8) == 0);
+                    inMenu = ReadUInt(ReadUInt(0xBCE914) + 0x38) == 0;
 
                     // Determine if in online mode or not
                     isOnlineMode = ReadUShort(ReadUInt(0xEC1A88) + 0x525) != 0;
@@ -338,6 +336,7 @@ namespace ASRT_RichPresence
                         if (inMenu)
                         {
                             richDetails = "In Lobby";
+                            richDetailsExtra = DeterminePlayerPerformance();
                             trackName = "";
                             trackImage = "asrtransformed";
                             racemodeName = "Online";
@@ -346,13 +345,19 @@ namespace ASRT_RichPresence
                         else
                         {
                             richDetails = racemodeName;
+                            if (racemodeName == "Capture the Chao")
+                            {
+                                richDetails = "Chao"; //Shorten to Chao
+                            }
                         }
 
+                        int playerPtr = DetermineNetworkPlayerPointer();
                         // Determine online mode
                         switch ((ReadULong(ReadUInt(0xEC1A88) + 0x101D6C) & 0x3F) - 13)
                         {
                             case 0:
                                 richState = "MM Race";
+                                playerRating = ReadInt(playerPtr + 0x2628);
                                 if (!inMenu)
                                 {
                                     richDetails = ""; // already know they are playing single race
@@ -382,13 +387,24 @@ namespace ASRT_RichPresence
                             racemodeName = "";
                             racemodeImage = "";
                         }
-                        else 
+                        else
                         {
-                            richState = menuState;
-                            if (racemodeName != menuState && racemodeName != "Grand Prix") // prevent repeating information
+                            if (racemodeName != menuState && racemodeName != "Grand Prix") // only show race mode info when necessary
                             {
-                                
+                                richState = menuState;
                                 richDetails = racemodeName;
+                            }
+                            else
+                            {
+                                richState = "";
+                                if (menuState == "Time Attack")
+                                {
+                                    richDetails = "TA"; // Shorten Time Attack to TA
+                                }
+                                else
+                                {
+                                    richDetails = menuState;
+                                }
                             }
                         }
                     }
@@ -400,18 +416,15 @@ namespace ASRT_RichPresence
                     }
                     lastRichState = richState;
                     lastRichDetails = richDetails;
-
-                    // Add extra racemode info
-                    if (extraInfo != "")
+                    
+                    // Add extra info
+                    if (richStateExtra != "")
                     {
-                        if (richDetails != "")
-                        {
-                            richDetails += " - " + extraInfo;
-                        }
-                        else
-                        {
-                            richState += " - " + extraInfo;
-                        }
+                        richState += (richState == "" ? "" : " - ") + richStateExtra;
+                    }
+                    if (richDetailsExtra != "")
+                    {
+                        richDetails += (richDetails == "" ? "" : " - ") + richDetailsExtra;
                     }
 
                     client.SetPresence(new RichPresence()
@@ -454,47 +467,287 @@ namespace ASRT_RichPresence
             return 0;
         }
 
-        public static int DetermineNetworkLobbyMembers()
+        public string GetTimeString(float time)
         {
-            int connectedClients = ReadUShort(ReadUInt(0xEC1A88) + 0x525);
+            if (time <= 0 || time >= 600)
+            {
+                return "";
+            }
+            return TimeSpan.FromSeconds(time).ToString("m\\:ss\\.fff");
+        }
+
+        public int DetermineNetworkLobbyMembers()
+        {
+            int connectedClients = ReadByte(ReadInt(0xEC1A88) + 0x525);
             int total = 0;
             for (int i = 0; i < connectedClients; i++)
             {
-                total += ReadUShort(ReadUInt((uint)(ReadUInt(0xEC1A88) + 0x528 + i * 4)) + 0x25D0);
+                total += ReadInt(ReadInt(ReadInt(0xEC1A88) + 0x528 + i * 4) + 0x25D0);
             }
             return total;
         }
 
-        public static int DetermineRacePosition()
+        public string GetRaceInfo()
         {
-            for (int i = 0; i < 10; i++)
+            int playerPtr = DetermineEnginePlayerPointer();
+            if (playerPtr == 0)
+            {
+                return "";
+            }
+            int position = DetermineRacePosition(playerPtr);
+            int lap = DetermineRaceLap(playerPtr);
+            if (position == -1 || lap == -1)
+            {
+                return "";
+            }
+
+            if (lap < 4)
+            {
+                return "Lap " + lap + ", " + position + GetOrdinal(position);
+            }
+            else
+            {
+                return "Finished " + position + GetOrdinal(position);
+            }
+        }
+
+        public int DetermineRacePosition(int playerPtr)
+        {
+            if (playerPtr == 0)
+            {
+                return -1;
+            }
+            int position = ReadByte(ReadInt(playerPtr + 0xC1B8) + 0x14) + 1;
+            if (position > 10)
+            {
+                return -1;
+            }
+            return position;
+        }
+
+        public int DetermineRaceLap(int playerPtr)
+        {
+            if (playerPtr == 0)
+            {
+                return -1;
+            }
+            int lap = ReadByte(ReadInt(playerPtr + 0xC1B8) + 0x8) + 1;
+            if (lap > 4)
+            {
+                return -1;
+            }
+            return lap;
+        }
+
+        // The player pointer used by the game engine
+        public int DetermineEnginePlayerPointer()
+        {
+            for (int i = 0; i < 10; i++) // iterate over player list
             {
                 int playerPtr = ReadInt(ReadInt(0xBCE920) + i * 4);
                 if (playerPtr != 0 && ReadInt(playerPtr + 0xC878) == 0)
                 {
-                    int position = ReadInt(ReadInt(playerPtr + 0xC1B8) + 0x14) + 1;
-                    return position <= 10 ? position : 0;
+                    return playerPtr; // player found
                 }
             }
             return 0;
         }
 
-        public static string GetOrdinal(int n)
+        // The player pointer used by the game engine
+        public int DetermineEnginePlayerIndex()
         {
-            switch (n)
+            for (int i = 0; i < 10; i++) // iterate over player list
+            {
+                int playerPtr = ReadInt(ReadInt(0xBCE920) + i * 4);
+                if (playerPtr != 0 && ReadInt(playerPtr + 0xC878) == 0)
+                {
+                    return i; // player found
+                }
+            }
+            return -1;
+        }
+
+
+        // The player pointer used for networking features
+        public int DetermineNetworkPlayerPointer()
+        {
+            int connectedClients = ReadByte(ReadInt(0xEC1A88) + 0x525);
+            for (int i = 0; i < connectedClients; i++) // iterate over player list
+            {
+                int playerPtr = ReadInt(ReadInt(0xEC1A88) + 0x528 + i * 4);
+                if (ReadInt(playerPtr + 0x10) == 0)
+                {
+                    return playerPtr; // player found
+                }
+            }
+            return 0;
+        }
+
+        public string GetOrdinal(int position)
+        {
+            switch (position)
             {
                 case 1:
-                    return "st";
+                    return "ˢᵗ";
                 case 2:
-                    return "nd";
+                    return "ⁿᵈ";
                 case 3:
-                    return "rd";
+                    return "ʳᵈ";
                 default:
-                    return "th";
+                    return "ᵗʰ";
+            }
+        }
+        public string DeterminePlayerPerformance()
+        {
+            int playerPtr = DetermineNetworkPlayerPointer();
+            if (playerPtr == 0)
+            {
+                return "";
+            }
+            if ((ReadByte(ReadInt(0xEC1A88) + 0x101D64) & 0x80) == 0)
+            {
+                return "Rating: " + ReadInt(playerPtr + 0x25FC) / 100000;
+            }
+            else
+            {
+                return "Score: " + ReadInt(playerPtr + 0x2628);
             }
         }
 
-        private static void OnJoin(object sender, JoinMessage args)
+        public string GetChaoInfo()
+        {
+            int playerPtr = DetermineEnginePlayerPointer();
+            if (playerPtr == 0)
+            {
+                return "";
+            }
+            int chaosCaptured = DetermineChaosCaptured(playerPtr);
+            int chaoPosition = DetermineNonRacePosition(playerPtr);
+            if (chaosCaptured == -1 || chaoPosition == -1)
+            {
+                return "";
+            }
+            return chaosCaptured + " captured, " + chaoPosition + GetOrdinal(chaoPosition);
+        }
+
+        public string GetBattleInfo(bool race)
+        {
+            int playerPtr = DetermineEnginePlayerPointer();
+            if (playerPtr == 0)
+            {
+                return "";
+            }
+            int lives = DetermineLives(playerPtr);
+            if (lives == -1)
+            {
+                return "";
+            }
+        
+            string info = "";
+            switch (lives)
+            {
+                case 0:
+                    switch (DetermineGhostHits(playerPtr))
+                    {
+                        case 0:
+                            info = "👻";
+                            break;
+                        case 1:
+                            info = "👻💔";
+                            break;
+                        case 2:
+                            info = "👻💔💔";
+                                break;
+                    }
+                    break;
+                case 1:
+                    info = "❤️";
+                    break;
+                case 2:
+                    info = "❤️❤️";
+                    break;
+                case 3:
+                    info = "❤️❤️❤️";
+                    break;
+            }
+            if (race)
+            {
+                int racePosition = DetermineRacePosition(playerPtr);
+                if (racePosition == -1)
+                {
+                    return "";
+                }
+                info += " " + racePosition + GetOrdinal(racePosition);
+            }
+            else
+            {
+                int position = DetermineNonRacePosition(playerPtr);
+                if (position == -1)
+                {
+                    return "";
+                }
+                info += " " + position + GetOrdinal(position);
+            }
+            return info;
+        }
+
+        public int DetermineChaosCaptured(int playerPtr)
+        {
+            if (playerPtr == 0)
+            {
+                return -1;
+            }
+            int chaosCaptured = ReadByte(ReadInt(playerPtr + 0xC1B8) + 0xC0);
+            if (chaosCaptured > 5)
+            {
+                return -1;
+            }
+            return chaosCaptured;
+        }
+
+        public int DetermineNonRacePosition(int playerPtr)
+        {
+            if (playerPtr == 0)
+            {
+                return -1;
+            }
+            int position = ReadByte(ReadInt(playerPtr + 0xC1B8) + 0x10) + 1;
+            if (position > 10)
+            {
+                return -1;
+            }
+            return position;
+        }
+
+        public int DetermineLives(int playerPtr)
+        {
+            if (playerPtr == 0)
+            {
+                return -1;
+            }
+            int lives = ReadByte(ReadInt(playerPtr + 0xC1B8) + 0xBC);
+            if (lives > 3)
+            {
+                return -1;
+            }
+            return lives;
+        }
+
+        public int DetermineGhostHits(int playerPtr)
+        {
+            if (playerPtr == 0)
+            {
+                return -1;
+            }
+            int ghostHits = ReadByte(ReadInt(playerPtr + 0xC1B8) + 0xBE);
+            if (ghostHits > 2)
+            {
+                return -1;
+            }
+            return ghostHits;
+        }
+
+        private void OnJoin(object sender, JoinMessage args)
         {
             Process.Start("steam://joinlobby/212480/" + args.Secret.Substring(7));
         }
