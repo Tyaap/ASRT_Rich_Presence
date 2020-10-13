@@ -516,35 +516,21 @@ namespace ASRT_RichPresence
             {
                 return "";
             }
-            int position = DetermineRacePosition(playerPtr);
+            int position = DeterminePosition(playerPtr, true);
             int lap = DetermineRaceLap(playerPtr);
             if (position == -1 || lap == -1)
             {
                 return "";
             }
 
-            if (lap < 4)
+            if (lap == 4 || ReadBoolean(0xBCE930)) // either finishes the race or gets DNF
             {
-                return "Lap " + lap + ", " + position + GetOrdinal(position);
+                return "Finished " + position + GetOrdinal(position);             
             }
             else
             {
-                return "Finished " + position + GetOrdinal(position);
+                return "Lap " + lap + ", " + position + GetOrdinal(position);
             }
-        }
-
-        public int DetermineRacePosition(int playerPtr)
-        {
-            if (playerPtr == 0)
-            {
-                return -1;
-            }
-            int position = ReadByte(ReadInt(playerPtr + 0xC1B8) + 0x14) + 1;
-            if (position > 10)
-            {
-                return -1;
-            }
-            return position;
         }
 
         public int DetermineRaceLap(int playerPtr)
@@ -619,6 +605,7 @@ namespace ASRT_RichPresence
                     return "ᵗʰ";
             }
         }
+
         public string DeterminePlayerPerformance()
         {
             int playerPtr = DetermineNetworkPlayerPointer();
@@ -644,12 +631,20 @@ namespace ASRT_RichPresence
                 return "";
             }
             int chaosCaptured = DetermineChaosCaptured(playerPtr);
-            int chaoPosition = DetermineNonRacePosition(playerPtr);
-            if (chaosCaptured == -1 || chaoPosition == -1)
+            int position = DeterminePosition(playerPtr, false);
+            if (chaosCaptured == -1 || position == -1)
             {
                 return "";
             }
-            return chaosCaptured + " captured, " + chaoPosition + GetOrdinal(chaoPosition);
+
+            if (ReadBoolean(0xBCE930))
+            {
+                return "Finished " + position + GetOrdinal(position);
+            }
+            else
+            {
+                return chaosCaptured + " captured, " + position + GetOrdinal(position);
+            }            
         }
 
         public string GetBattleInfo(bool race)
@@ -664,7 +659,17 @@ namespace ASRT_RichPresence
             {
                 return "";
             }
-        
+            int position = DeterminePosition(playerPtr, race);
+            if (position == -1)
+            {
+                return "";
+            }
+
+            if (ReadBoolean(0xBCE930))
+            {
+                return "Finished " + position + GetOrdinal(position);
+            }
+
             string info = "";
             switch (lives)
             {
@@ -692,24 +697,7 @@ namespace ASRT_RichPresence
                     info = "❤️❤️❤️";
                     break;
             }
-            if (race)
-            {
-                int racePosition = DetermineRacePosition(playerPtr);
-                if (racePosition == -1)
-                {
-                    return "";
-                }
-                info += " " + racePosition + GetOrdinal(racePosition);
-            }
-            else
-            {
-                int position = DetermineNonRacePosition(playerPtr);
-                if (position == -1)
-                {
-                    return "";
-                }
-                info += " " + position + GetOrdinal(position);
-            }
+            info += " " + position + GetOrdinal(position);
             return info;
         }
 
@@ -727,13 +715,13 @@ namespace ASRT_RichPresence
             return chaosCaptured;
         }
 
-        public int DetermineNonRacePosition(int playerPtr)
+        public int DeterminePosition(int playerPtr, bool race)
         {
             if (playerPtr == 0)
             {
                 return -1;
             }
-            int position = ReadByte(ReadInt(playerPtr + 0xC1B8) + 0x10) + 1;
+            int position = ReadByte(ReadInt(playerPtr + 0xC1B8) + (race ? 0x14 : 0x10)) + 1;
             if (position > 10)
             {
                 return -1;
