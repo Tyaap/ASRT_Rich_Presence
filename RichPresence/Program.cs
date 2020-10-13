@@ -45,6 +45,7 @@ namespace ASRT_RichPresence
                 int lobbySize = 0;
                 DateTime startTimestamp = DateTime.UtcNow;
                 int playerRating = 0;
+                int gpRaceNumber = 0;
 
                 // Final variables for Discord RichPresence
                 string richState = "";
@@ -52,9 +53,137 @@ namespace ASRT_RichPresence
                 string lastRichState = "";
                 string lastRichDetails = "";
 
-                // Simple rich presence test
                 while (true)
                 {
+                    // Determine track name
+                    switch (ReadUInt(ReadUInt(0xBC7434)))
+                    {
+                        case 0xD4257EBD:
+                            trackName = "Ocean View";
+                            trackImage = "oceanview";
+                            gpRaceNumber = 1;
+                            break;
+                        case 0x32D305A8:
+                            trackName = "Samba Studios";
+                            trackImage = "sambastudios";
+                            gpRaceNumber = 2;
+                            break;
+                        case 0xC72B3B98:
+                            trackName = "Carrier Zone";
+                            trackImage = "carrierzone";
+                            gpRaceNumber = 3;
+                            break;
+                        case 0x03EB7FFF:
+                            trackName = "Dragon Canyon";
+                            trackImage = "dragoncanyon";
+                            gpRaceNumber = 4;
+                            break;
+                        case 0xE3121777:
+                            trackName = "Temple Trouble";
+                            trackImage = "templetrouble";
+                            gpRaceNumber = 1;
+                            break;
+                        case 0x4E015AB6:
+                            trackName = "Galactic Parade";
+                            trackImage = "galacticparade";
+                            gpRaceNumber = 2;
+                            break;
+                        case 0x503C1CBC:
+                            trackName = "Seasonal Shrines";
+                            trackImage = "seasonalshrines";
+                            gpRaceNumber = 3;
+                            break;
+                        case 0x7534B7CA:
+                            trackName = "Rogue's Landing";
+                            trackImage = "rogueslanding";
+                            gpRaceNumber = 4;
+                            break;
+                        case 0x38A394ED:
+                            trackName = "Dream Valley";
+                            trackImage = "dreamvalley";
+                            gpRaceNumber = 1;
+                            break;
+                        case 0xC5C9DEA1:
+                            trackName = "Chilly Castle";
+                            trackImage = "chillycastle";
+                            gpRaceNumber = 2;
+                            break;
+                        case 0xD936550C:
+                            trackName = "Graffiti City";
+                            trackImage = "graffiticity";
+                            gpRaceNumber = 3;
+                            break;
+                        case 0x4A0FF7AE:
+                            trackName = "Sanctuary Falls";
+                            trackImage = "sanctuaryfalls";
+                            gpRaceNumber = 4;
+                            break;
+                        case 0xCD8017BA:
+                            trackName = "Graveyard Gig";
+                            trackImage = "graveyardgig";
+                            gpRaceNumber = 1;
+                            break;
+                        case 0xDC93F18B:
+                            trackName = "Adder's Lair";
+                            trackImage = "adderslair";
+                            gpRaceNumber = 2;
+                            break;
+                        case 0x2DB91FC2:
+                            trackName = "Burning Depths";
+                            trackImage = "burningdepths";
+                            gpRaceNumber = 3;
+                            break;
+                        case 0x94610644:
+                            trackName = "Race of AGES";
+                            trackImage = "raceofages";
+                            gpRaceNumber = 4;
+                            break;
+                        case 0xE6CD97F0:
+                            trackName = "Sunshine Tour";
+                            trackImage = "sunshinetour";
+                            gpRaceNumber = 1;
+                            break;
+                        case 0xE87FDF22:
+                            trackName = "Shibuya Downtown";
+                            trackImage = "shibuyadowntown";
+                            gpRaceNumber = 2;
+                            break;
+                        case 0x17463C8D:
+                            trackName = "Roulette Road";
+                            trackImage = "rouletteroad";
+                            gpRaceNumber = 3;
+                            break;
+                        case 0xFEBC639E:
+                            trackName = "Egg Hangar";
+                            trackImage = "egghangar";
+                            gpRaceNumber = 4;
+                            break;
+                        case 0x1EF56CE1:
+                            trackName = "Outrun Bay";
+                            trackImage = "outrunbay";
+                            break;
+                        case 0xB9B67B8F:
+                            trackName = "Neon Docks";
+                            trackImage = "neondocks";
+                            break;
+                        case 0x7583BBD6:
+                            trackName = "Battle Bay";
+                            trackImage = "battlebay";
+                            break;
+                        case 0x997E9C42:
+                            trackName = "Creepy Courtyard";
+                            trackImage = "creepycourtyard";
+                            break;
+                        case 0x8DABE769:
+                            trackName = "Rooftop Rumble";
+                            trackImage = "rooftoprumble";
+                            break;
+                        case 0x38A73138:
+                            trackName = "Monkey Ball Park";
+                            trackImage = "monkeyballpark";
+                            break;
+                    }
+
                     // Determine race mode
                     // Todo: finish uploading the images!
                     richStateExtra = "";
@@ -121,7 +250,9 @@ namespace ASRT_RichPresence
                         case 0x091F29F4:
                             racemodeName = "Grand Prix";
                             racemodeImage = "gprace";
-                            // todo: extraInfo = "race [number]/4"
+                            string raceInfo = GetRaceInfo();
+                            richStateExtra = "Race " + gpRaceNumber + (raceInfo == "" ? "" : ", " + raceInfo);
+                            // todo: extraInfo = "Race "
                             break;
                         case 0xAD538D8D:
                             racemodeName = "Ring Race";
@@ -132,115 +263,6 @@ namespace ASRT_RichPresence
                             racemodeName = "Boost Race";
                             racemodeImage = "boostrace";
                             richDetailsExtra = GetRaceInfo();
-                            break;
-                    }
-
-                    // Determine track name
-                    switch (ReadUInt(ReadUInt(0xBC7434) + 0))
-                    {
-                        case 0xD4257EBD:
-                            trackName = "Ocean View";
-                            trackImage = "oceanview";
-                            break;
-                        case 0x32D305A8:
-                            trackName = "Samba Studios";
-                            trackImage = "sambastudios";
-                            break;
-                        case 0xC72B3B98:
-                            trackName = "Carrier Zone";
-                            trackImage = "carrierzone";
-                            break;
-                        case 0x03EB7FFF:
-                            trackName = "Dragon Canyon";
-                            trackImage = "dragoncanyon";
-                            break;
-                        case 0xE3121777:
-                            trackName = "Temple Trouble";
-                            trackImage = "templetrouble";
-                            break;
-                        case 0x4E015AB6:
-                            trackName = "Galactic Parade";
-                            trackImage = "galacticparade";
-                            break;
-                        case 0x503C1CBC:
-                            trackName = "Seasonal Shrines";
-                            trackImage = "seasonalshrines";
-                            break;
-                        case 0x7534B7CA:
-                            trackName = "Rogue's Landing";
-                            trackImage = "rogueslanding";
-                            break;
-                        case 0x38A394ED:
-                            trackName = "Dream Valley";
-                            trackImage = "dreamvalley";
-                            break;
-                        case 0xC5C9DEA1:
-                            trackName = "Chilly Castle";
-                            trackImage = "chillycastle";
-                            break;
-                        case 0xD936550C:
-                            trackName = "Graffiti City";
-                            trackImage = "graffiticity";
-                            break;
-                        case 0x4A0FF7AE:
-                            trackName = "Sanctuary Falls";
-                            trackImage = "sanctuaryfalls";
-                            break;
-                        case 0xCD8017BA:
-                            trackName = "Graveyard Gig";
-                            trackImage = "graveyardgig";
-                            break;
-                        case 0xDC93F18B:
-                            trackName = "Adder's Lair";
-                            trackImage = "adderslair";
-                            break;
-                        case 0x2DB91FC2:
-                            trackName = "Burning Depths";
-                            trackImage = "burningdepths";
-                            break;
-                        case 0x94610644:
-                            trackName = "Race of AGES";
-                            trackImage = "raceofages";
-                            break;
-                        case 0xE6CD97F0:
-                            trackName = "Sunshine Tour";
-                            trackImage = "sunshinetour";
-                            break;
-                        case 0xE87FDF22:
-                            trackName = "Shibuya Downtown";
-                            trackImage = "shibuyadowntown";
-                            break;
-                        case 0x17463C8D:
-                            trackName = "Roulette Road";
-                            trackImage = "rouletteroad";
-                            break;
-                        case 0xFEBC639E:
-                            trackName = "Egg Hangar";
-                            trackImage = "egghangar";
-                            break;
-                        case 0x1EF56CE1:
-                            trackName = "Outrun Bay";
-                            trackImage = "outrunbay";
-                            break;
-                        case 0xB9B67B8F:
-                            trackName = "Neon Docks";
-                            trackImage = "neondocks";
-                            break;
-                        case 0x7583BBD6:
-                            trackName = "Battle Bay";
-                            trackImage = "battlebay";
-                            break;
-                        case 0x997E9C42:
-                            trackName = "Creepy Courtyard";
-                            trackImage = "creepycourtyard";
-                            break;
-                        case 0x8DABE769:
-                            trackName = "Rooftop Rumble";
-                            trackImage = "rooftoprumble";
-                            break;
-                        case 0x38A73138:
-                            trackName = "Monkey Ball Park";
-                            trackImage = "monkeyballpark";
                             break;
                     }
 
