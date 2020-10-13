@@ -27,7 +27,7 @@ namespace ASRT_RichPresence
                 client.Initialize();
 
                 // Initial code for online support
-                client.RegisterUriScheme(executable: Directory.GetCurrentDirectory() + "\\LaunchGame.exe");
+                client.RegisterUriScheme(executable: "explorer steam://rungameid/212480");
                 client.SetSubscription(EventType.Join);
                 client.OnJoin += OnJoin;
 
@@ -101,7 +101,7 @@ namespace ASRT_RichPresence
                         case 0xBC7C19CF:
                             racemodeName = "Persuit";
                             racemodeImage = "persuit";
-                            // todo: extraInfo = tank health?
+                            // todo: extraInfo = Tank: [number]%
                             break;
                         case 0xB06F818B:
                             racemodeName = "Drift Challenge";
@@ -750,6 +750,15 @@ namespace ASRT_RichPresence
         private void OnJoin(object sender, JoinMessage args)
         {
             Process.Start("steam://joinlobby/212480/" + args.Secret.Substring(7));
+        }
+
+        public string GetSteamLocation()
+        {
+            using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("Software\\Valve\\Steam"))
+            {
+                if (key == null) return null;
+                return key.GetValue("SteamExe") as string;
+            }
         }
     }
 }
