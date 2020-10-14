@@ -279,73 +279,88 @@ namespace ASRT_RichPresence
                     isOnlineMode = ReadUShort(ReadUInt(0xEC1A88) + 0x525) != 0;
 
                     // Determine menu state
-                    switch (ReadInt(0xC56890))
+
+                    switch (ReadInt(0xC51AD0))
                     {
                         case 0:
-                            // Determine tour
-                            switch (ReadInt(0xC55F1C))
+                            switch (ReadInt(0xC56890))
                             {
                                 case 0:
-                                    menuState = "Sunshine Coast";
+                                    // Determine tour
+                                    switch (ReadInt(0xC55F1C))
+                                    {
+                                        case 0:
+                                            menuState = "Sunshine Coast";
+                                            break;
+                                        case 1:
+                                            menuState = "Frozen Valley";
+                                            break;
+                                        case 2:
+                                            menuState = "Scorching Skies";
+                                            break;
+                                        case 3:
+                                            menuState = "Twilight Engine";
+                                            break;
+                                        case 4:
+                                            menuState = "Moonlight Park";
+                                            break;
+                                        case 5:
+                                            menuState = "Superstar Showdown";
+                                            break;
+                                    }
                                     break;
                                 case 1:
-                                    menuState = "Frozen Valley";
+                                    // Determine Grand Prix
+                                    switch (ReadInt(0xC51D44))
+                                    {
+                                        case 0:
+                                            menuState = "Dragon Cup";
+                                            break;
+                                        case 1:
+                                            menuState = "Rogue Cup";
+                                            break;
+                                        case 2:
+                                            menuState = "Emerald Cup";
+                                            break;
+                                        case 3:
+                                            menuState = "Arcade Cup";
+                                            break;
+                                        case 4:
+                                            menuState = "Classic Cup";
+                                            break;
+                                        case 5:
+                                            menuState = "Dragon Cup (Mirror)";
+                                            break;
+                                        case 6:
+                                            menuState = "Rogue Cup (Mirror)";
+                                            break;
+                                        case 7:
+                                            menuState = "Emerald Cup (Mirror)";
+                                            break;
+                                        case 8:
+                                            menuState = "Arcade Cup (Mirror)";
+                                            break;
+                                        case 9:
+                                            menuState = "Classic Cup (Mirror)";
+                                            break;
+                                    }
                                     break;
                                 case 2:
-                                    menuState = "Scorching Skies";
+                                    menuState = "Time Attack";
                                     break;
                                 case 3:
-                                    menuState = "Twilight Engine";
-                                    break;
-                                case 4:
-                                    menuState = "Moonlight Park";
-                                    break;
-                                case 5:
-                                    menuState = "Superstar Showdown";
+                                    menuState = "Single Race";
                                     break;
                             }
                             break;
                         case 1:
-                            // Determine Grand Prix
-                            switch (ReadInt(0xC51D44))
-                            {
-                                case 0:
-                                    menuState = "Dragon Cup";
-                                    break;
-                                case 1:
-                                    menuState = "Rogue Cup";
-                                    break;
-                                case 2:
-                                    menuState = "Emerald Cup";
-                                    break;
-                                case 3:
-                                    menuState = "Arcade Cup";
-                                    break;
-                                case 4:
-                                    menuState = "Classic Cup";
-                                    break;
-                                case 5:
-                                    menuState = "Dragon Cup (Mirror)";
-                                    break;
-                                case 6:
-                                    menuState = "Rogue Cup (Mirror)";
-                                    break;
-                                case 7:
-                                    menuState = "Emerald Cup (Mirror)";
-                                    break;
-                                case 8:
-                                    menuState = "Arcade Cup (Mirror)";
-                                    break;
-                                case 9:
-                                    menuState = "Classic Cup (Mirror)";
-                                    break;
-                            }
+                            menuState = "Matchmaking";
                             break;
                         case 2:
-                            menuState = "Time Attack";
+                            menuState = "Custom Game";
                             break;
                         case 3:
-                            menuState = "Single Race";
+                            menuState = "Options";
                             break;
                     }
 
