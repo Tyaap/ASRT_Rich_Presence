@@ -393,15 +393,11 @@ namespace ASRT_RichPresence
                         switch ((ReadULong(ReadUInt(0xEC1A88) + 0x101D6C) & 0x3F) - 13)
                         {
                             case 0:
-                                richState = "MM Race";
+                                richState = "Matchmaking";
                                 playerRating = ReadInt(playerPtr + 0x2628);
-                                if (!inMenu)
-                                {
-                                    richDetails = ""; // already know they are playing single race
-                                }
                                 break;
                             case 1:
-                                richState = "MM Arena";
+                                richState = "Matchmaking";
                                 break;
                             case 2:
                                 richState = "Lucky Dip";
@@ -630,7 +626,8 @@ namespace ASRT_RichPresence
             }
             if ((ReadByte(ReadInt(0xEC1A88) + 0x101D64) & 0x80) == 0)
             {
-                return "Rating: " + ReadInt(playerPtr + 0x25FC) / 100000;
+                int rating = ReadInt(playerPtr + 0x25FC) / 100000;
+                return "Rating: " + (rating != 0 ? rating : 1000);
             }
             else
             {
