@@ -12,13 +12,14 @@ When playing S&ASRT your profile will show:
 
 *The other players must also have S&ASRT Rich Presence installed for this to work, so get them to install it too. :)
 ## How to install
-1. Copy these files to the game directory:
+1. Download `ASRT_Rich_Presence.zip` from the [latest release](https://github.com/Tyaap/ASRT_Rich_Presence/releases)
+2. Open the zip file and copy these files to the game directory:
    - `dinput8.dll`
    - `RichPresence.dll`
    - `DiscordRPC.dll`
    - `Newtonsoft.Json.dll`
-2. Check you [Discord settings](https://i2.wp.com/www.techjunkie.com/wp-content/uploads/2020/08/Screenshot-21.png) to make sure S&ASRT is added (it usually is already)
-3. Run the game and check your Discord status!
+3. Check you [Discord settings](https://i2.wp.com/www.techjunkie.com/wp-content/uploads/2020/08/Screenshot-21.png) to make sure S&ASRT is added (it usually is already)
+4. Run the game and check your Discord status!
 
 ## How it works
 1. When the game launches it loads `dinput8.dll`. This is written in pure C, and is a proxy for the real DirectInput API made by Microsoft.
