@@ -25,6 +25,7 @@ When playing S&ASRT your profile will show:
 2. The game calls `DirectInput8Create` from this DLL, which triggers the creation of a new thread.
 3. This thread runs a CLR bootstrapper which loads `RichPresence.dll`
 4. The .NET code inside `RichPresence.dll` hosts a Discord rich presence client.
+5. The client periodically retireves information from the game memory and updates your rich presence state.
 
 ## How to develop
 * Clone and build the project using [Visual Studio 2019](https://visualstudio.microsoft.com/downloads/).
