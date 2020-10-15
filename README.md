@@ -17,7 +17,7 @@ When playing S&ASRT your profile will show:
    - `RichPresence.dll`
    - `DiscordRPC.dll`
    - `Newtonsoft.Json.dll`
-2. Make sure S&ASRT is added as an app in the Discord desktop client.
+2. Check your [Discord settings](https://i2.wp.com/www.techjunkie.com/wp-content/uploads/2020/08/Screenshot-21.png) to make sure S&ASRT is added as an app in the Discord desktop client.
 3. Run the game and check your Discord status!
 
 ## How it works
