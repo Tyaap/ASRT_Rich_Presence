@@ -1,5 +1,6 @@
 # S&ASRT Rich Presence
-[Discord Rich Rresence](https://discord.com/rich-presence) for Sonic & All-Stars Racing Transformed!
+#### [Discord Rich Rresence](https://discord.com/rich-presence) for Sonic & All-Stars Racing Transformed! ####
+
 When playing S&ASRT your profile will show:
 * The track/arena you are playing
 * The game mode you are playing
@@ -7,7 +8,7 @@ When playing S&ASRT your profile will show:
 * Many more details, for example the lap and position in a race
 * Pretty icons for the track and game mode you are playing
 
-You can also join other players from their Discord profile, and send invitations directly in the Discord chat!*
+#### You can also join other players from their Discord profile, and send invitations directly in the Discord chat!* ####
 
 *The other players must also have S&ASRT Rich Presence installed for this to work, so get them to install it too. :)
 ## How to install
