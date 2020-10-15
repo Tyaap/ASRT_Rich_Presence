@@ -1,5 +1,5 @@
 # S&ASRT Rich Presence
- Discord rich presence for Sonic & All-Stars Racing Transformed!
+[Discord Rich Rresence](https://discord.com/rich-presence) for Sonic & All-Stars Racing Transformed!
 
 ## How to install
 1. Copy these files to the game directory:
